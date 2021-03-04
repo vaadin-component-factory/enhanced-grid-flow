@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Basic example with setItems
  */
-@Route(value = "", layout = MainLayout.class)
+@Route(value = "single", layout = MainLayout.class)
 public class SimpleSingleSelectView extends Div {
 
 
@@ -26,17 +26,16 @@ public class SimpleSingleSelectView extends Div {
         grid.addColumn(Person::getFirstName).setHeader("First Name");
         grid.addColumn(Person::getAge).setHeader("Age");
 
-        grid.setSelectionMode(Grid.SelectionMode.MULTI);
+        grid.setSelectionMode(Grid.SelectionMode.SINGLE);
 
-        grid.asMultiSelect().addValueChangeListener(event -> {
+        grid.asSingleSelect().addValueChangeListener(event -> {
             String message = String.format("Selection changed from %s to %s",
                 event.getOldValue(), event.getValue());
             messageDiv.setText(message);
         });
 
         // You can pre-select items
-        //grid.select(personList.get(1));
-        grid.asMultiSelect().select(personList.get(0), personList.get(1));
+        grid.select(personList.get(1));
         add(grid, messageDiv);
     }
 
