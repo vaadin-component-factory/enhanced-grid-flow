@@ -1,7 +1,7 @@
 package com.vaadin.componentfactory.enhancedgrid.service;
 
-import com.vaadin.componentfactory.enhancedgrid.SelectionTreeGrid;
 import com.vaadin.componentfactory.enhancedgrid.bean.DummyFile;
+import com.vaadin.flow.component.treegrid.TreeGrid;
 import com.vaadin.flow.data.provider.hierarchy.AbstractBackEndHierarchicalDataProvider;
 import com.vaadin.flow.data.provider.hierarchy.HierarchicalDataProvider;
 import com.vaadin.flow.data.provider.hierarchy.HierarchicalQuery;
@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 
 public class TreeGridUtil {
 
-    public static SelectionTreeGrid<DummyFile> getDummyFileTreeGrid(SelectionTreeGrid<DummyFile> grid) {
+    public static TreeGrid<DummyFile> getDummyFileTreeGrid(TreeGrid<DummyFile> grid) {
         HierarchicalDataProvider<DummyFile, Void> dataProvider =
                 new AbstractBackEndHierarchicalDataProvider<DummyFile, Void>() {
 
