@@ -25,7 +25,7 @@ import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.function.SerializableRunnable;
 
 /**
- * This class has been overriden to change the webcomponent
+ * This class has been overridden to change the webcomponent
  */
 @Tag("custom-grid-flow-selection-column")
 @JsModule("./src/custom-grid-flow-selection-column.js")
