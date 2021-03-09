@@ -20,8 +20,8 @@ package com.vaadin.componentfactory.enhancedgrid;
  * #L%
  */
 
-import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEvent;
+import com.vaadin.flow.component.ComponentUtil;
 import com.vaadin.flow.component.grid.CustomAbstractGridMultiSelectionModel;
 import com.vaadin.flow.component.grid.CustomAbstractGridSingleSelectionModel;
 import com.vaadin.flow.component.grid.Grid;
@@ -31,7 +31,6 @@ import com.vaadin.flow.data.selection.SelectionEvent;
 import com.vaadin.flow.function.SerializablePredicate;
 import elemental.json.JsonObject;
 
-import java.lang.reflect.Method;
 import java.util.Objects;
 
 /**
@@ -121,14 +120,7 @@ public class EnhancedGrid<T> extends Grid<T> {
 
                 @Override
                 protected void fireSelectionEvent(SelectionEvent<Grid<T>, T> event) {
-                    Method fireEvent;
-                    try {
-                        fireEvent = Component.class.getDeclaredMethod("fireEvent", ComponentEvent.class);
-                        fireEvent.setAccessible(true);
-                        fireEvent.invoke(getGrid(),(ComponentEvent<Grid<?>>) event);
-                    } catch (Exception ignored) {
-                        ignored.printStackTrace();
-                    }
+                    ComponentUtil.fireEvent(getGrid(), (ComponentEvent<Grid<?>>) event);
                 }
             };
             setSelectionModel(model, selectionMode);
@@ -138,14 +130,7 @@ public class EnhancedGrid<T> extends Grid<T> {
 
                 @Override
                 protected void fireSelectionEvent(SelectionEvent<Grid<T>, T> event) {
-                    Method fireEvent;
-                    try {
-                        fireEvent = Component.class.getDeclaredMethod("fireEvent", ComponentEvent.class);
-                        fireEvent.setAccessible(true);
-                        fireEvent.invoke(getGrid(),(ComponentEvent<Grid<?>>) event);
-                    } catch (Exception ignored) {
-                        ignored.printStackTrace();
-                    }
+                    ComponentUtil.fireEvent(getGrid(), (ComponentEvent<Grid<?>>) event);
                 }
 
                 @Override
@@ -162,5 +147,4 @@ public class EnhancedGrid<T> extends Grid<T> {
             return super.setSelectionMode(selectionMode);
         }
     }
-
 }
