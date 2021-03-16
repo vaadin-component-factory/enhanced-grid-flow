@@ -1,12 +1,16 @@
 package com.vaadin.componentfactory.enhancedgrid;
 
+import java.util.List;
+
 import com.vaadin.componentfactory.enhancedgrid.bean.Person;
 import com.vaadin.componentfactory.enhancedgrid.service.PersonService;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.Grid.Column;
+import com.vaadin.flow.component.grid.editor.Editor;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.Route;
-
-import java.util.List;
 
 /**
  * Basic example with setItems
@@ -23,7 +27,7 @@ public class SimpleSingleSelectView extends Div {
         grid.setSelectionFilter(p -> p.getAge() > 18);
         grid.setItems(personList);
 
-        grid.addColumn(Person::getFirstName).setHeader("First Name");
+        Column<Person> firstNameColumn = grid.addColumn(Person::getFirstName).setHeader("First Name");
         grid.addColumn(Person::getAge).setHeader("Age");
 
         grid.setSelectionMode(Grid.SelectionMode.SINGLE);
@@ -33,9 +37,27 @@ public class SimpleSingleSelectView extends Div {
                 event.getOldValue(), event.getValue());
             messageDiv.setText(message);
         });
-
+        
         // You can pre-select items
         grid.select(personList.get(1));
+               
+        // edit items
+        grid.setEditableFilter(p -> p.getAge() > 18);        
+        
+        Binder<Person> binder = new Binder<>(Person.class);
+		Editor<Person> editor = grid.getEditor();
+		editor.setBinder(binder);
+		editor.setBuffered(true);
+	      
+        TextField firstNameField = new TextField();
+        binder.bind(firstNameField, Person::getFirstName, Person::setFirstName);
+        firstNameColumn.setEditorComponent(firstNameField);
+               
+        grid.addItemDoubleClickListener(event -> {
+            grid.editItem(event.getItem());
+            firstNameField.focus();
+        });                
+       
         add(grid, messageDiv);
     }
 

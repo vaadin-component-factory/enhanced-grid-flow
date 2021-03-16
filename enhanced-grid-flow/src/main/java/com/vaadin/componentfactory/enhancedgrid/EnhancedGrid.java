@@ -1,6 +1,5 @@
 package com.vaadin.componentfactory.enhancedgrid;
 
-
 /*
  * #%L
  * enhanced-grid-flow
@@ -23,6 +22,7 @@ package com.vaadin.componentfactory.enhancedgrid;
 
 import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.ComponentUtil;
+import com.vaadin.flow.component.grid.CancelEditConfirmDialog;
 import com.vaadin.flow.component.grid.CustomAbstractGridMultiSelectionModel;
 import com.vaadin.flow.component.grid.CustomAbstractGridSingleSelectionModel;
 import com.vaadin.flow.component.grid.Grid;
@@ -32,7 +32,11 @@ import com.vaadin.flow.component.grid.GridSelectionModel;
 import com.vaadin.flow.data.provider.DataGenerator;
 import com.vaadin.flow.data.selection.SelectionEvent;
 import com.vaadin.flow.function.SerializableBiFunction;
+import com.vaadin.flow.function.SerializableConsumer;
 import com.vaadin.flow.function.SerializablePredicate;
+import com.vaadin.flow.router.BeforeLeaveEvent;
+import com.vaadin.flow.router.BeforeLeaveEvent.ContinueNavigationAction;
+import com.vaadin.flow.router.BeforeLeaveObserver;
 
 import elemental.json.JsonObject;
 
@@ -43,8 +47,24 @@ import java.util.Objects;
  *
  * @param <T>
  */
-public class EnhancedGrid<T> extends Grid<T> {
+public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver {
 
+	private static final String CANCEL_EDIT_MSG_KEY = "cancel-edit-dialog.text";
+	    
+    private static final String CANCEL_EDIT_CONFIRM_BTN_KEY = "cancel-edit-dialog.confirm-btn";
+    
+    private static final String CANCEL_EDIT_CANCEL_BTN_KEY = "cancel-edit-dialog.cancel-btn";
+    
+    private SerializablePredicate<T> selectionFilter = item -> true;
+    
+    private DataGenerator<T> generateSelectionGenerator;
+    
+    private SerializablePredicate<T> editableFilter = item -> true;
+    
+    private T onEditItem;
+    
+    private boolean showCancelEditDialog = true;	    
+	
     /**
      * @see Grid#Grid()
      */
@@ -117,10 +137,11 @@ public class EnhancedGrid<T> extends Grid<T> {
     	super(pageSize, updateQueueBuilder, dataCommunicatorBuilder);
     }
     
-    
-    private SerializablePredicate<T> selectionFilter = item -> true;
-    private DataGenerator<T> generateSelectionGenerator;
-
+    /**
+     * Define if an item can be selected.
+     * 
+     * @return
+     */
     public SerializablePredicate<T> getSelectionFilter() {
         return selectionFilter;
     }
@@ -187,4 +208,94 @@ public class EnhancedGrid<T> extends Grid<T> {
             return super.setSelectionMode(selectionMode);
         }
     }
+    
+   
+    /**
+     * Define if an item can be edited.
+     * 
+     * @param editableFilter
+     */
+    public void setEditableFilter(SerializablePredicate<T> editableFilter) {
+        this.editableFilter = editableFilter;
+    }
+    
+    /**
+     * Return whether an item is editable or not.
+     * 
+     * @param item
+     * @return
+     */
+    public boolean isEditable(T item) {
+    	return this.editableFilter.test(item);
+    }
+        
+    /**
+     * Edit the selected item.
+     * 
+     * @param item
+     */
+    public void editItem(T item) {
+    	if(!isEditable(item)) {
+    		return;
+    	}
+    	    	
+    	if(onEditItem != null && item.equals(onEditItem)) {
+    		return;
+    	}
+    	
+		if(onEditItem != null && !item.equals(onEditItem) && allowCancelEditDialogDisplay()) {
+			cancelEditItem(item, null);
+		} else {
+			this.getEditor().editItem(item);
+	   		this.onEditItem = item;
+		}        
+    }
+    
+    private void cancelEditItem(T newEditItem, ContinueNavigationAction action) {
+    	String text = getTranslation(CANCEL_EDIT_MSG_KEY);
+    	String confirmText = getTranslation(CANCEL_EDIT_CONFIRM_BTN_KEY); 
+    	String cancelText = getTranslation(CANCEL_EDIT_CANCEL_BTN_KEY);
+       	SerializableConsumer<T> onConfirmCallback = action != null ? item -> this.onConfirmEditItem(newEditItem, action) : item -> this.onConfirmEditItem(newEditItem);
+       	new CancelEditConfirmDialog<T>(text, confirmText, cancelText, onConfirmCallback, newEditItem).open();
+     }
+   
+    private void onConfirmEditItem(T newEditItem) {
+    	this.getEditor().cancel();
+		if(newEditItem != null) {
+			this.getEditor().editItem(newEditItem);
+		}
+		this.onEditItem = newEditItem;
+    }
+    
+    private void onConfirmEditItem(T newEditItem, ContinueNavigationAction action) {
+    	this.onConfirmEditItem(null);
+    	action.proceed();
+    }
+   
+	/**
+	 * Set showCancelEditDialog value to know if {@link CancelEditConfirmDialog} should be displayed.
+	 * 
+	 * @param showCancelEditDialog
+	 */
+	public void setShowCancelEditDialog(boolean showCancelEditDialog) {
+		this.showCancelEditDialog = showCancelEditDialog;
+	}
+    
+	/**
+	 * {@link CancelEditConfirmDialog} will be displayed if showCancelEditDialog is true
+	 * && editor is in buffered mode.
+	 * 
+	 * @return
+	 */
+	private boolean allowCancelEditDialogDisplay() {
+		return showCancelEditDialog && this.getEditor().isBuffered();
+	}	
+    
+	@Override
+	public void beforeLeave(BeforeLeaveEvent event) {		
+		if(onEditItem != null && allowCancelEditDialogDisplay()) {
+			ContinueNavigationAction action = event.postpone();
+			cancelEditItem(null, action);
+		}		
+	}
 }
