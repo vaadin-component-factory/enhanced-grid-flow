@@ -1,5 +1,6 @@
 package com.vaadin.componentfactory.enhancedgrid;
 
+
 /*
  * #%L
  * enhanced-grid-flow
@@ -25,10 +26,14 @@ import com.vaadin.flow.component.ComponentUtil;
 import com.vaadin.flow.component.grid.CustomAbstractGridMultiSelectionModel;
 import com.vaadin.flow.component.grid.CustomAbstractGridSingleSelectionModel;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.GridArrayUpdater;
+import com.vaadin.flow.component.grid.GridArrayUpdater.UpdateQueueData;
 import com.vaadin.flow.component.grid.GridSelectionModel;
 import com.vaadin.flow.data.provider.DataGenerator;
 import com.vaadin.flow.data.selection.SelectionEvent;
+import com.vaadin.flow.function.SerializableBiFunction;
 import com.vaadin.flow.function.SerializablePredicate;
+
 import elemental.json.JsonObject;
 
 import java.util.Objects;
@@ -77,7 +82,42 @@ public class EnhancedGrid<T> extends Grid<T> {
     public EnhancedGrid(Class<T> beanType) {
         super(beanType);
     }
-
+    
+    /**
+     * 
+     * @see Grid#Grid(Class, SerializableBiFunction, DataCommunicatorBuilder)
+     * 
+     * @param <U>
+     * @param <B>
+     * @param beanType
+     * @param updateQueueBuilder
+     * @param dataCommunicatorBuilder
+     */
+    protected <U extends GridArrayUpdater, B extends DataCommunicatorBuilder<T, U>> EnhancedGrid(
+            Class<T> beanType,
+            SerializableBiFunction<UpdateQueueData, Integer, UpdateQueue> updateQueueBuilder,
+            B dataCommunicatorBuilder){
+    	super(beanType, updateQueueBuilder, dataCommunicatorBuilder);
+    }
+    
+    /**
+     * 
+     * @see Grid#Grid(int, SerializableBiFunction, DataCommunicatorBuilder)
+     * 
+     * @param <U>
+     * @param <B>
+     * @param pageSize
+     * @param updateQueueBuilder
+     * @param dataCommunicatorBuilder
+     */
+    protected <U extends GridArrayUpdater, B extends DataCommunicatorBuilder<T, U>> EnhancedGrid(
+            int pageSize,
+            SerializableBiFunction<UpdateQueueData, Integer, UpdateQueue> updateQueueBuilder,
+            B dataCommunicatorBuilder) {
+    	super(pageSize, updateQueueBuilder, dataCommunicatorBuilder);
+    }
+    
+    
     private SerializablePredicate<T> selectionFilter = item -> true;
     private DataGenerator<T> generateSelectionGenerator;
 
