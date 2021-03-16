@@ -210,7 +210,7 @@ public abstract class CustomAbstractGridSingleSelectionModel<T> extends
             SelectionEvent<Grid<T>, T> event);
 
     private void doSelect(T item, boolean userOriginated) {
-        if (!((EnhancedGrid) getGrid()).getSelectionFilter().test(item)) {
+        if (item != null && ((EnhancedGrid) getGrid()).getSelectionFilter().test(item)) {
             T oldValue = selectedItem;
             selectedItem = item;
             fireSelectionEvent(new SingleSelectionEvent<>(getGrid(),
