@@ -59,7 +59,7 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver {
     
     private DataGenerator<T> generateSelectionGenerator;
     
-    private SerializablePredicate<T> editableFilter = item -> true;
+    private SerializablePredicate<T> editablePredicate = item -> true;
         
     private boolean showCancelEditDialog = true;	    
 	
@@ -211,10 +211,10 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver {
     /**
      * Define if an item can be edited.
      * 
-     * @param editableFilter
+     * @param editablePredicate
      */
-    public void setEditableFilter(SerializablePredicate<T> editableFilter) {
-        this.editableFilter = editableFilter;
+    public void setEditablePredicate(SerializablePredicate<T> editablePredicate) {
+        this.editablePredicate = editablePredicate;
     }
     
     /**
@@ -224,7 +224,7 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver {
      * @return
      */
     public boolean isEditable(T item) {
-    	return this.editableFilter.test(item);
+    	return this.editablePredicate.test(item);
     }
         
     /**

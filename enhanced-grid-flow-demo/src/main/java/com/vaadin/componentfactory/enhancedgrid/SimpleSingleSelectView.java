@@ -37,12 +37,12 @@ public class SimpleSingleSelectView extends Div {
                 event.getOldValue(), event.getValue());
             messageDiv.setText(message);
         });
-        
+                
         // You can pre-select items
         grid.select(personList.get(1));
                
         // edit items
-        grid.setEditableFilter(p -> p.getAge() > 18);        
+        grid.setEditablePredicate(p -> p.getAge() > 18);        
         
         Binder<Person> binder = new Binder<>(Person.class);
 		Editor<Person> editor = grid.getEditor();
