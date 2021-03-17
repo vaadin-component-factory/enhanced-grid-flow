@@ -23,9 +23,9 @@ package com.vaadin.flow.component.grid;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.Paragraph;
-import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
+import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.function.SerializableConsumer;
+import com.vaadin.flow.function.SerializableRunnable;
 
 @SuppressWarnings("serial")
 public class CancelEditConfirmDialog<T> extends Dialog {
@@ -36,7 +36,7 @@ public class CancelEditConfirmDialog<T> extends Dialog {
 	
 	private Button cancelButton;
 	
-	public CancelEditConfirmDialog(String text, String confirmText, String cancelText, SerializableConsumer<T> onConfirmCallback, T editItem) {
+	public CancelEditConfirmDialog(String text, String confirmText, String cancelText, SerializableRunnable onConfirmCallback) {
 	
 		setCloseOnEsc(true);
     	setCloseOnOutsideClick(false);
@@ -44,7 +44,7 @@ public class CancelEditConfirmDialog<T> extends Dialog {
     	message = new Paragraph(text);
 		
     	confirmButton = new Button(confirmText, e -> {
-    		onConfirmCallback.accept(editItem);
+    		onConfirmCallback.run();
     		this.close();    		
     	});
     	
@@ -52,7 +52,7 @@ public class CancelEditConfirmDialog<T> extends Dialog {
     	
     	HorizontalLayout buttonsLayout = new HorizontalLayout();
     	buttonsLayout.setWidthFull();
-    	buttonsLayout.setAlignItems(Alignment.END); 
+    	buttonsLayout.setJustifyContentMode(JustifyContentMode.END); 
     	buttonsLayout.add(confirmButton, cancelButton);
     	add(message, buttonsLayout);
 	}

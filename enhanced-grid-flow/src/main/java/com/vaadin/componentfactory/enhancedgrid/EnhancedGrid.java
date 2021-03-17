@@ -1,5 +1,7 @@
 package com.vaadin.componentfactory.enhancedgrid;
 
+import java.util.Objects;
+
 /*
  * #%L
  * enhanced-grid-flow
@@ -32,15 +34,13 @@ import com.vaadin.flow.component.grid.GridSelectionModel;
 import com.vaadin.flow.data.provider.DataGenerator;
 import com.vaadin.flow.data.selection.SelectionEvent;
 import com.vaadin.flow.function.SerializableBiFunction;
-import com.vaadin.flow.function.SerializableConsumer;
 import com.vaadin.flow.function.SerializablePredicate;
+import com.vaadin.flow.function.SerializableRunnable;
 import com.vaadin.flow.router.BeforeLeaveEvent;
 import com.vaadin.flow.router.BeforeLeaveEvent.ContinueNavigationAction;
 import com.vaadin.flow.router.BeforeLeaveObserver;
 
 import elemental.json.JsonObject;
-
-import java.util.Objects;
 
 /**
  * Add a selectionFilter to forbid the grid selection for specific rows
@@ -60,9 +60,7 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver {
     private DataGenerator<T> generateSelectionGenerator;
     
     private SerializablePredicate<T> editableFilter = item -> true;
-    
-    private T onEditItem;
-    
+        
     private boolean showCancelEditDialog = true;	    
 	
     /**
@@ -235,10 +233,11 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver {
      * @param item
      */
     public void editItem(T item) {
-    	if(!isEditable(item)) {
+        if(!isEditable(item)) {
     		return;
     	}
-    	    	
+        
+        T onEditItem = this.getEditor().getItem();    	    	
     	if(onEditItem != null && item.equals(onEditItem)) {
     		return;
     	}
@@ -247,16 +246,23 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver {
 			cancelEditItem(item, null);
 		} else {
 			this.getEditor().editItem(item);
-	   		this.onEditItem = item;
 		}        
+    }
+    
+    /**
+     * Cancel the current item edition.
+     * 
+     */
+    public void cancelEdit() {
+    	cancelEditItem(null, null);
     }
     
     private void cancelEditItem(T newEditItem, ContinueNavigationAction action) {
     	String text = getTranslation(CANCEL_EDIT_MSG_KEY);
     	String confirmText = getTranslation(CANCEL_EDIT_CONFIRM_BTN_KEY); 
     	String cancelText = getTranslation(CANCEL_EDIT_CANCEL_BTN_KEY);
-       	SerializableConsumer<T> onConfirmCallback = action != null ? item -> this.onConfirmEditItem(newEditItem, action) : item -> this.onConfirmEditItem(newEditItem);
-       	new CancelEditConfirmDialog<T>(text, confirmText, cancelText, onConfirmCallback, newEditItem).open();
+       	SerializableRunnable onConfirmCallback = action != null ? () -> this.onConfirmEditItem(newEditItem, action) : () -> this.onConfirmEditItem(newEditItem);
+       	new CancelEditConfirmDialog<T>(text, confirmText, cancelText, onConfirmCallback).open();
      }
    
     private void onConfirmEditItem(T newEditItem) {
@@ -264,7 +270,6 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver {
 		if(newEditItem != null) {
 			this.getEditor().editItem(newEditItem);
 		}
-		this.onEditItem = newEditItem;
     }
     
     private void onConfirmEditItem(T newEditItem, ContinueNavigationAction action) {
@@ -292,7 +297,8 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver {
 	}	
     
 	@Override
-	public void beforeLeave(BeforeLeaveEvent event) {		
+	public void beforeLeave(BeforeLeaveEvent event) {
+		T onEditItem = this.getEditor().getItem();
 		if(onEditItem != null && allowCancelEditDialogDisplay()) {
 			ContinueNavigationAction action = event.postpone();
 			cancelEditItem(null, action);
