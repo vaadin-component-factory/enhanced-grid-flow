@@ -24,6 +24,7 @@ import java.util.Objects;
 
 import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.ComponentUtil;
+import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.grid.CancelEditConfirmDialog;
 import com.vaadin.flow.component.grid.CustomAbstractGridMultiSelectionModel;
 import com.vaadin.flow.component.grid.CustomAbstractGridSingleSelectionModel;
@@ -47,6 +48,7 @@ import elemental.json.JsonObject;
  *
  * @param <T>
  */
+@CssImport(value = "./styles/enhanced-grid-selection-disabled.css", themeFor = "vaadin-grid")
 public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver {
 
 	private static final String CANCEL_EDIT_MSG_KEY = "cancel-edit-dialog.text";
@@ -156,6 +158,13 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver {
         }
         generateSelectionGenerator = this::generateSelectionAccess;
         addDataGenerator(generateSelectionGenerator);
+       
+        setClassNameGenerator(item -> {
+    		if(!selectionPredicate.test(item)) {
+    			return "selection-disabled";
+    		}
+			return null; 
+    	});
     }
 
     /**
@@ -169,7 +178,7 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver {
             jsonObject.put("selectionDisabled", true);
         }
     }
-
+    
     @Override
     public GridSelectionModel<T> setSelectionMode(SelectionMode selectionMode) {
         if (selectionMode == SelectionMode.MULTI) {
