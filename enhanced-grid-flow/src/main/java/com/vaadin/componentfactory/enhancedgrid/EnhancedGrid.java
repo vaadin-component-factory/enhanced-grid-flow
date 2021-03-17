@@ -43,7 +43,7 @@ import com.vaadin.flow.router.BeforeLeaveObserver;
 import elemental.json.JsonObject;
 
 /**
- * Add a selectionFilter to forbid the grid selection for specific rows
+ * Add a selectionPredicate to forbid the grid selection for specific rows
  *
  * @param <T>
  */
@@ -55,7 +55,7 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver {
     
     private static final String CANCEL_EDIT_CANCEL_BTN_KEY = "cancel-edit-dialog.cancel-btn";
     
-    private SerializablePredicate<T> selectionFilter = item -> true;
+    private SerializablePredicate<T> selectionPredicate = item -> true;
     
     private DataGenerator<T> generateSelectionGenerator;
     
@@ -140,17 +140,17 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver {
      * 
      * @return
      */
-    public SerializablePredicate<T> getSelectionFilter() {
-        return selectionFilter;
+    public SerializablePredicate<T> getSelectionPredicate() {
+        return selectionPredicate;
     }
 
     /**
-     * Disable selection/deselection of the item that doesn't match the selectionFilter
+     * Disable selection/deselection of the item that doesn't match the selectionPredicate
      *
-     * @param selectionFilter selectionFilter
+     * @param selectionPredicate selectionPredicate
      */
-    public void setSelectionFilter(SerializablePredicate<T> selectionFilter) {
-        this.selectionFilter = selectionFilter;
+    public void setSelectionPredicate(SerializablePredicate<T> selectionPredicate) {
+        this.selectionPredicate = selectionPredicate;
         if (generateSelectionGenerator != null) {
             removeDataGenerator(generateSelectionGenerator);
         }
@@ -165,7 +165,7 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver {
      * @param jsonObject jsonObject
      */
     private void generateSelectionAccess(T item, JsonObject jsonObject) {
-        if (!selectionFilter.test(item)) {
+        if (!selectionPredicate.test(item)) {
             jsonObject.put("selectionDisabled", true);
         }
     }

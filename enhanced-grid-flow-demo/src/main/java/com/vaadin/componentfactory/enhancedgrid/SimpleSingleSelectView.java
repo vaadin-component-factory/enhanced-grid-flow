@@ -24,7 +24,7 @@ public class SimpleSingleSelectView extends Div {
 
         List<Person> personList = getItems();
         EnhancedGrid<Person> grid = new EnhancedGrid<>();
-        grid.setSelectionFilter(p -> p.getAge() > 18);
+        grid.setSelectionPredicate(p -> p.getAge() > 18);
         grid.setItems(personList);
 
         Column<Person> firstNameColumn = grid.addColumn(Person::getFirstName).setHeader("First Name");

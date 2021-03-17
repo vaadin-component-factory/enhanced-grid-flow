@@ -16,7 +16,7 @@ public class SingleTreeGridView extends Div {
 		 
 		DepartmentData departmentData = new DepartmentData();
     	EnhancedTreeGrid<Department> grid = new EnhancedTreeGrid<>();
-    	grid.setSelectionFilter(d -> d.getName().startsWith("T"));
+    	grid.setSelectionPredicate(d -> d.getName().startsWith("T"));
     	
     	grid.setSelectionMode(SelectionMode.SINGLE);
     	
