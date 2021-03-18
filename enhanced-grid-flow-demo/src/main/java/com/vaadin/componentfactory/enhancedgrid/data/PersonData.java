@@ -1,4 +1,4 @@
-package com.vaadin.componentfactory.enhancedgrid.service;
+package com.vaadin.componentfactory.enhancedgrid.data;
 
 import com.vaadin.componentfactory.enhancedgrid.bean.Address;
 import com.vaadin.componentfactory.enhancedgrid.bean.MaritalStatus;

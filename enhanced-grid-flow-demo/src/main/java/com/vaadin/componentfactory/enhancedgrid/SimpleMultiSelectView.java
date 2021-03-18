@@ -1,7 +1,5 @@
 package com.vaadin.componentfactory.enhancedgrid;
 
-import java.util.List;
-
 import com.vaadin.componentfactory.enhancedgrid.bean.Person;
 import com.vaadin.componentfactory.enhancedgrid.service.PersonService;
 import com.vaadin.flow.component.grid.Grid;
@@ -12,15 +10,18 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.Route;
 
-/**
- * Basic single selection grid example with setItems
- */
-@Route(value = "single", layout = MainLayout.class)
-public class SimpleSingleSelectView extends Div {
+import java.util.List;
 
-    public SimpleSingleSelectView() {
+/**
+ * Basic multiple selection grid example with setItems
+ */
+@Route(value = "", layout = MainLayout.class)
+public class SimpleMultiSelectView extends Div {
+
+    public SimpleMultiSelectView() {
         Div messageDiv = new Div();
 
+        // set items
         List<Person> personList = getItems();
         EnhancedGrid<Person> grid = new EnhancedGrid<>();
         
@@ -33,17 +34,17 @@ public class SimpleSingleSelectView extends Div {
         grid.addColumn(Person::getAge).setHeader("Age");
 
         // set selection mode
-        grid.setSelectionMode(Grid.SelectionMode.SINGLE);
+        grid.setSelectionMode(Grid.SelectionMode.MULTI);
 
-        grid.asSingleSelect().addValueChangeListener(event -> {
+        grid.asMultiSelect().addValueChangeListener(event -> {
             String message = String.format("Selection changed from %s to %s",
                 event.getOldValue(), event.getValue());
             messageDiv.setText(message);
         });
-                
+
         // can pre-select items
-        grid.select(personList.get(1));
-               
+        grid.asMultiSelect().select(personList.get(0), personList.get(1));
+        
         // set editable predicate to indicate which items can be edited
         grid.setEditablePredicate(p -> p.getAge() > 18);        
         
@@ -62,7 +63,7 @@ public class SimpleSingleSelectView extends Div {
             grid.editItem(event.getItem());
             firstNameField.focus();
         });                
-       
+        
         add(grid, messageDiv);
     }
 

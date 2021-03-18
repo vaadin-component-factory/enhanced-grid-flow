@@ -1,6 +1,7 @@
 package com.vaadin.componentfactory.enhancedgrid.service;
 
 import com.vaadin.componentfactory.enhancedgrid.bean.Person;
+import com.vaadin.componentfactory.enhancedgrid.data.PersonData;
 
 import java.util.List;
 
