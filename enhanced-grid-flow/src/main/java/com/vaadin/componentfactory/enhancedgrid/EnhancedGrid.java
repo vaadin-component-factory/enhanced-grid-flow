@@ -45,6 +45,7 @@ import elemental.json.JsonObject;
 
 /**
  * Add a selectionPredicate to forbid the grid selection for specific rows
+ * Add a editablePredicate to forbid the edition for specific rows
  *
  * @param <T>
  */
@@ -64,7 +65,7 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver {
     private SerializablePredicate<T> editablePredicate = item -> true;
         
     private boolean showCancelEditDialog = true;	    
-	
+    	
     /**
      * @see Grid#Grid()
      */
@@ -271,7 +272,7 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver {
     	String confirmText = getTranslation(CANCEL_EDIT_CONFIRM_BTN_KEY); 
     	String cancelText = getTranslation(CANCEL_EDIT_CANCEL_BTN_KEY);
        	SerializableRunnable onConfirmCallback = action != null ? () -> this.onConfirmEditItem(newEditItem, action) : () -> this.onConfirmEditItem(newEditItem);
-       	new CancelEditConfirmDialog<T>(text, confirmText, cancelText, onConfirmCallback).open();
+       	new CancelEditConfirmDialog(text, confirmText, cancelText, onConfirmCallback).open();
      }
    
     private void onConfirmEditItem(T newEditItem) {
@@ -283,7 +284,7 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver {
     
     private void onConfirmEditItem(T newEditItem, ContinueNavigationAction action) {
     	this.onConfirmEditItem(null);
-    	action.proceed();
+    	action.proceed(); 
     }
    
 	/**
@@ -312,5 +313,7 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver {
 			ContinueNavigationAction action = event.postpone();
 			cancelEditItem(null, action);
 		}		
-	}
+	}	
+	
 }
+

@@ -28,7 +28,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.function.SerializableRunnable;
 
 @SuppressWarnings("serial")
-public class CancelEditConfirmDialog<T> extends Dialog {
+public class CancelEditConfirmDialog extends Dialog {
 	
 	private Paragraph message;
 	
@@ -61,24 +61,12 @@ public class CancelEditConfirmDialog<T> extends Dialog {
 		return message;
 	}
 
-	public void setMessage(Paragraph message) {
-		this.message = message;
-	}
-
 	public Button getConfirmButton() {
 		return confirmButton;
-	}
-
-	public void setConfirmButton(Button confirmButton) {
-		this.confirmButton = confirmButton;
 	}
 
 	public Button getCancelButton() {
 		return cancelButton;
 	}
-
-	public void setCancelButton(Button cancelButton) {
-		this.cancelButton = cancelButton;
-	}	
 		
 }
