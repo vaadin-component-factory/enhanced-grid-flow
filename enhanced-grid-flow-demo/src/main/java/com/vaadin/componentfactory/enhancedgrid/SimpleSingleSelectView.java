@@ -27,10 +27,11 @@ public class SimpleSingleSelectView extends Div {
         // set selection predicate to indicate which items can be selected
         grid.setSelectionPredicate(p -> p.getAge() > 18);
         grid.setItems(personList);
-
+     
         // add columns
         Column<Person> firstNameColumn = grid.addColumn(Person::getFirstName).setHeader("First Name");
         grid.addColumn(Person::getAge).setHeader("Age");
+        firstNameColumn.setSortable(true);
 
         // set selection mode
         grid.setSelectionMode(Grid.SelectionMode.SINGLE);
@@ -61,7 +62,12 @@ public class SimpleSingleSelectView extends Div {
         grid.addItemDoubleClickListener(event -> {
             grid.editItem(event.getItem());
             firstNameField.focus();
-        });                
+        });
+        
+        // cancel edit
+        grid.getElement().addEventListener("keyup",
+                event -> grid.getEditor().cancel())
+        .setFilter("event.key === 'Escape' || event.key === 'Esc'");
        
         add(grid, messageDiv);
     }

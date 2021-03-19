@@ -72,7 +72,12 @@ public class LazyMultiSelectView extends Div {
         grid.addItemDoubleClickListener(event -> {
             grid.editItem(event.getItem());
             firstNameField.focus();
-        });                
+        });         
+        
+        // cancel edit
+        grid.getElement().addEventListener("keyup",
+                event -> grid.getEditor().cancel())
+        .setFilter("event.key === 'Escape' || event.key === 'Esc'");
        
         add(grid, messageDiv);
     }

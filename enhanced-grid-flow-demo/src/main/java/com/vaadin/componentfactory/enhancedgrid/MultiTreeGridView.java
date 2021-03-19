@@ -64,6 +64,11 @@ public class MultiTreeGridView extends Div {
             grid.editItem(event.getItem());
             nameField.focus();
         });                
+        
+        // cancel edit
+        grid.getElement().addEventListener("keyup",
+                event -> grid.getEditor().cancel())
+        .setFilter("event.key === 'Escape' || event.key === 'Esc'");
 		
 		add(grid, messageDiv);
 	 }
