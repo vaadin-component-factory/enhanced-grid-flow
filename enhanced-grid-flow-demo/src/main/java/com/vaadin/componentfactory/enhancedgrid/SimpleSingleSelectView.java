@@ -3,7 +3,10 @@ package com.vaadin.componentfactory.enhancedgrid;
 import java.util.List;
 
 import com.vaadin.componentfactory.enhancedgrid.bean.Person;
+import com.vaadin.componentfactory.enhancedgrid.filtering.TextFieldFilterDto;
+import com.vaadin.componentfactory.enhancedgrid.filtering.TextFilterField;
 import com.vaadin.componentfactory.enhancedgrid.service.PersonService;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.grid.editor.Editor;
@@ -29,7 +32,8 @@ public class SimpleSingleSelectView extends Div {
         grid.setItems(personList);
      
         // add columns
-        Column<Person> firstNameColumn = grid.addColumn(Person::getFirstName).setHeader("First Name");
+        Column<Person> firstNameColumn = grid.addColumn(Person::getFirstName).setHeader("First Name", new TextFilterField());
+        grid.addColumn(Person::getLastName).setHeader("Last Name", new TextFilterField(new TextFieldFilterDto("Allen")));
         grid.addColumn(Person::getAge).setHeader("Age");
         firstNameColumn.setSortable(true);
 
@@ -43,7 +47,7 @@ public class SimpleSingleSelectView extends Div {
         });
                 
         // can pre-select items
-        grid.select(personList.get(1));
+        grid.select(personList.get(0));
                
         // set editable predicate to indicate which items can be edited
         grid.setEditablePredicate(p -> p.getAge() > 18);        
@@ -66,9 +70,27 @@ public class SimpleSingleSelectView extends Div {
         
         // cancel edit
         grid.getElement().addEventListener("keyup",
-                event -> grid.getEditor().cancel())
+                event -> editor.cancel())
         .setFilter("event.key === 'Escape' || event.key === 'Esc'");
        
+        // add column with save button, to invoke when editing item
+        grid.addComponentColumn(person -> {
+            Button save = new Button("Save");
+            
+            save.addClickListener(e -> {
+                editor.save();                
+                firstNameField.focus();
+            });
+            save.setEnabled(editor.isOpen());
+            return save;
+        });
+        
+        // show save item message
+        editor.addSaveListener(
+                event -> messageDiv.setText("Item saved: " + event.getItem().getFirstName() + ", "
+                		+ event.getItem().getLastName() + ", "
+                        + event.getItem().getAge()));
+        
         add(grid, messageDiv);
     }
 

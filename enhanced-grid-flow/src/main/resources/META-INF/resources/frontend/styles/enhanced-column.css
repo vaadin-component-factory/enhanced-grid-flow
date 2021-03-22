@@ -1,0 +1,18 @@
+#filter-button {
+	font-size: var(--lumo-font-size-s);
+	margin-left: 25px;
+	background-color: transparent;
+}
+
+#filter-button:hover::before {
+	opacity: 0;
+}
+
+.filter-selected {
+	color: var(--lumo-primary-text-color);
+}
+
+.filter-not-selected {
+	color: var(--lumo-body-text-color);
+	opacity: 0.2;
+}

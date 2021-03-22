@@ -1,6 +1,10 @@
 package com.vaadin.componentfactory.enhancedgrid;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
+import java.util.function.BiFunction;
+import java.util.function.Predicate;
 
 /*
  * #%L
@@ -25,18 +29,23 @@ import java.util.Objects;
 import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.ComponentUtil;
 import com.vaadin.flow.component.dependency.CssImport;
+import com.vaadin.flow.component.grid.ApplyFilterListener;
 import com.vaadin.flow.component.grid.CancelEditConfirmDialog;
 import com.vaadin.flow.component.grid.CustomAbstractGridMultiSelectionModel;
 import com.vaadin.flow.component.grid.CustomAbstractGridSingleSelectionModel;
+import com.vaadin.flow.component.grid.FilterField;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridArrayUpdater;
 import com.vaadin.flow.component.grid.GridArrayUpdater.UpdateQueueData;
 import com.vaadin.flow.component.grid.GridSelectionModel;
 import com.vaadin.flow.data.provider.DataGenerator;
+import com.vaadin.flow.data.provider.ListDataProvider;
+import com.vaadin.flow.data.renderer.Renderer;
 import com.vaadin.flow.data.selection.SelectionEvent;
 import com.vaadin.flow.function.SerializableBiFunction;
 import com.vaadin.flow.function.SerializablePredicate;
 import com.vaadin.flow.function.SerializableRunnable;
+import com.vaadin.flow.function.ValueProvider;
 import com.vaadin.flow.router.BeforeLeaveEvent;
 import com.vaadin.flow.router.BeforeLeaveEvent.ContinueNavigationAction;
 import com.vaadin.flow.router.BeforeLeaveObserver;
@@ -50,7 +59,7 @@ import elemental.json.JsonObject;
  * @param <T>
  */
 @CssImport(value = "./styles/enhanced-grid-selection-disabled.css", themeFor = "vaadin-grid")
-public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver {
+public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver, ApplyFilterListener {
 
 	private static final String CANCEL_EDIT_MSG_KEY = "cancel-edit-dialog.text";
 	    
@@ -315,5 +324,57 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver {
 		}		
 	}	
 	
+	/**
+	 * @see Grid#getDefaultColumnFactory()
+	 * 
+	 */
+	@Override
+	protected BiFunction<Renderer<T>, String, Column<T>> getDefaultColumnFactory() {
+		return (renderer, columnId) -> new EnhancedColumn(this, columnId, renderer);
+	}
+	
+	/**
+	 * @see Grid#addColumn(ValueProvider)
+	 * 
+	 */
+	@Override
+	public EnhancedColumn<T> addColumn(ValueProvider<T, ?> valueProvider) {
+        BiFunction<Renderer<T>, String, Column<T>> defaultFactory = getDefaultColumnFactory();
+        return (EnhancedColumn<T>) super.addColumn(valueProvider, defaultFactory);
+    }
+	
+	@Override
+	public void onApplyFilter(Object filter) {
+		applyFilter();		
+	}	
+	
+	/**
+	 * Apply the filters selected for each column in {@link FilterField}
+	 * 
+	 */
+	public void applyFilter() {
+		List<Predicate<T>> predicates = new ArrayList<>();
+		for(Column<T> column : getColumns()) {
+			EnhancedColumn<T> enhancedColumn = (EnhancedColumn<T>)column;
+			if(enhancedColumn.getFilter() != null) {
+				ValueProvider<T, ?> columnValueProvider = enhancedColumn.getValueProvider();
+				Predicate<Object> filterPredicate = enhancedColumn.getFilter().getValue().getFilterPredicate();
+				predicates.add(p -> filterPredicate.test(columnValueProvider.apply(p))); 
+				enhancedColumn.updateFilterButtonStyle();
+			}
+		}
+		
+		SerializablePredicate<T> finalPredicate = t -> {
+			for(Predicate<T> predicate : predicates) {
+				if(!predicate.test(t)) {
+					return false;
+				}					
+			}
+			return true;
+		};
+		
+		((ListDataProvider<T>)getDataProvider()).setFilter(finalPredicate);
+	}	
+
 }
 
