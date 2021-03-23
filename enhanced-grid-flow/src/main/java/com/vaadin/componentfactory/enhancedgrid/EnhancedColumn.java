@@ -96,10 +96,7 @@ public class EnhancedColumn<T> extends Grid.Column<T> {
         filterField.setFor(filterButton.getId().get());
         filterField.addApplyFilterListener(grid);
         filterField.addFilterComponent(filter.getElement().getComponent().get());
-        filterButton.addClickListener(e -> {
-        	filterField.setOpened(true);
-        });
-        
+                      
         // this is needed to avoid issues when adding popup
         headerComponent.getElement().appendChild(filterButton.getElement());
         headerComponent.getElement().executeJs("return").then(ignore -> {
