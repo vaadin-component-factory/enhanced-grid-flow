@@ -1,15 +1,16 @@
 package com.vaadin.componentfactory.enhancedgrid;
 
-import java.util.List;
-
 import com.vaadin.componentfactory.enhancedgrid.bean.Person;
+import com.vaadin.componentfactory.enhancedgrid.filtering.TextFilterField;
 import com.vaadin.componentfactory.enhancedgrid.service.PersonService;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
+import com.vaadin.flow.component.grid.Filter;
 import com.vaadin.flow.component.grid.editor.Editor;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.router.Route;
 
@@ -23,28 +24,24 @@ public class LazySingleSelectView extends Div {
 	 public LazySingleSelectView() {
         Div messageDiv = new Div();
         
-        // get data 
+        // get lazy data provider
+        Filter gridFilter = new Filter();
         PersonService personService = new PersonService();
-        DataProvider<Person, Void> dataProvider =
-    	    DataProvider.fromCallbacks(
-    	        query -> {
-    	            int offset = query.getOffset();
-    	            int limit = query.getLimit();
-    	            List<Person> persons = personService
-    	                    .fetch(offset, limit);
-    	            return persons.stream();
-    	        },
-    	        query -> personService.count()
-    	);
-    	
+                
+        ConfigurableFilterDataProvider<Person,Void,Filter> dataProvider =
+        		DataProvider.<Person, Filter>fromFilteringCallbacks(
+    	                query -> personService.fetchPersons(query.getOffset(), query.getLimit(), query.getFilter()),
+    	                query -> (int) personService.getPersonCount(query.getFilter())).withConfigurableFilter();
+        
         EnhancedGrid<Person> grid = new EnhancedGrid<>();
         grid.setDataProvider(dataProvider);
+        dataProvider.setFilter(gridFilter);  
         
         // set selection predicate to indicate which items can be selected
         grid.setSelectionPredicate(p -> p.getAge() > 18);
         
         // add columns
-        Column<Person> firstNameColumn = grid.addColumn(Person::getFirstName).setHeader("First Name");
+        Column<Person> firstNameColumn = grid.addColumn(Person::getFirstName).setHeader("First Name", new TextFilterField());
         grid.addColumn(Person::getAge).setHeader("Age");
 
         grid.setSelectionMode(Grid.SelectionMode.SINGLE);
@@ -80,6 +77,6 @@ public class LazySingleSelectView extends Div {
         .setFilter("event.key === 'Escape' || event.key === 'Esc'");
        
         add(grid, messageDiv);
-    }
+    }	 
 
 }

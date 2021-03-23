@@ -1,11 +1,5 @@
 package com.vaadin.componentfactory.enhancedgrid;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.function.BiFunction;
-import java.util.function.Predicate;
-
 /*
  * #%L
  * enhanced-grid-flow
@@ -26,6 +20,12 @@ import java.util.function.Predicate;
  * #L%
  */
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.function.BiFunction;
+import java.util.function.Predicate;
+
 import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.ComponentUtil;
 import com.vaadin.flow.component.dependency.CssImport;
@@ -38,7 +38,10 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridArrayUpdater;
 import com.vaadin.flow.component.grid.GridArrayUpdater.UpdateQueueData;
 import com.vaadin.flow.component.grid.GridSelectionModel;
+import com.vaadin.flow.component.grid.Filter;
+import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
 import com.vaadin.flow.data.provider.DataGenerator;
+import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.renderer.Renderer;
 import com.vaadin.flow.data.selection.SelectionEvent;
@@ -373,7 +376,12 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver, App
 			return true;
 		};
 		
-		((ListDataProvider<T>)getDataProvider()).setFilter(finalPredicate);
+		DataProvider<T, ?> dataProvider = getDataProvider();
+		if(dataProvider instanceof ListDataProvider<?>) {				
+			((ListDataProvider<T>)dataProvider).setFilter(finalPredicate);		
+		} else if(dataProvider instanceof ConfigurableFilterDataProvider){
+			((ConfigurableFilterDataProvider<T,Void,Filter>)dataProvider).setFilter(new Filter(finalPredicate));
+		}		
 	}	
 
 }
