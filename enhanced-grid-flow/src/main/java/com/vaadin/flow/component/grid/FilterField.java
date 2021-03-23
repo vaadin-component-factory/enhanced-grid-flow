@@ -51,9 +51,9 @@ public class FilterField extends Popup {
 	}
 		
 	private HorizontalLayout createButtonsLayout() {
-		applyButton = new Button("Apply", e -> onApply());
+		applyButton = new Button("Apply", e -> applyFilter());
 		applyButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
-		resetButton = new Button("Reset", e -> onReset());    	
+		resetButton = new Button("Reset", e -> resetFilter());    	
 		resetButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
     	HorizontalLayout buttonsLayout = new HorizontalLayout();
     	buttonsLayout.setWidthFull();
@@ -62,12 +62,12 @@ public class FilterField extends Popup {
     	return buttonsLayout;
 	}
 
-	public void onApply() {
+	public void applyFilter() {
 		applyFilterListener.onApplyFilter(((HasValue<?,?>)filterComponent).getValue());		
 		this.hide();
 	}
 
-	public void onReset() {
+	public void resetFilter() {
 		((HasValue<?,?>)filterComponent).clear();
 	}
 
@@ -75,7 +75,7 @@ public class FilterField extends Popup {
 		this.filterComponent = filterComponent;
 		filterComponentDiv.add(filterComponent);
 		if(!isEmptyFilter()) {
-			onApply();
+			applyFilter();
 		}
 	}	
 	

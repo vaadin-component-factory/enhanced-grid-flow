@@ -52,6 +52,8 @@ public class EnhancedColumn<T> extends Grid.Column<T> {
 	
 	private Button filterButton;
 	
+	private FilterField filterField;
+	
 	/**
 	 * @see Column#Column(Grid, String, Renderer)
 	 * 
@@ -90,7 +92,7 @@ public class EnhancedColumn<T> extends Grid.Column<T> {
         filterButton.addClassName("filter-not-selected");
         
         // add filter field popup and set filter as it's filter component
-        FilterField filterField = new FilterField();
+        filterField = new FilterField();
         filterField.setFor(filterButton.getId().get());
         filterField.addApplyFilterListener(grid);
         filterField.addFilterComponent(filter.getElement().getComponent().get());
@@ -134,6 +136,14 @@ public class EnhancedColumn<T> extends Grid.Column<T> {
 
 	public void setValueProvider(ValueProvider<T, ?> valueProvider) {
 		this.valueProvider = valueProvider;
+	}
+	
+	/**
+	 * Clear selected filter.
+	 * 
+	 */
+	public void clearFilter(){
+		filterField.resetFilter();
 	}
 	
 }

@@ -11,6 +11,8 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.grid.editor.Editor;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.Route;
@@ -91,7 +93,14 @@ public class SimpleSingleSelectView extends Div {
                 		+ event.getItem().getLastName() + ", "
                         + event.getItem().getAge()));
         
-        add(grid, messageDiv);
+        // add layout for buttons
+        HorizontalLayout horizontalLayout = new HorizontalLayout();
+        horizontalLayout.setWidthFull();
+        Button clearFiltersButton = new Button("Clear Filters", e -> grid.clearAllFilters());
+        horizontalLayout.setJustifyContentMode(JustifyContentMode.END);
+        horizontalLayout.add(clearFiltersButton);
+        
+        add(grid, messageDiv, horizontalLayout);
     }
 
     private List<Person> getItems() {

@@ -384,5 +384,19 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver, App
 		}		
 	}	
 
+	/**
+	 * Clear all selected filters and updates the displayed data.
+	 * 
+	 */
+	public void clearAllFilters() {
+		for(Column<T> column : getColumns()) {
+			EnhancedColumn<T> enhancedColumn = (EnhancedColumn<T>)column;
+			if(enhancedColumn.getFilter() != null) {			
+				enhancedColumn.clearFilter();
+			}
+		}
+		applyFilter();		
+	}
+		
 }
 
