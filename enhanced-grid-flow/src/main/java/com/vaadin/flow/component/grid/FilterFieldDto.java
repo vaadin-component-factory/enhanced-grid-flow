@@ -22,7 +22,7 @@ package com.vaadin.flow.component.grid;
 
 import java.util.function.Predicate;
 
-public interface FilterDto<T> {
+public interface FilterFieldDto<T> {
 
 	Predicate<T> getFilterPredicate();
 	

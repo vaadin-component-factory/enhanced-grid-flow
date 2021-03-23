@@ -5,9 +5,9 @@ import java.util.function.Predicate;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.vaadin.flow.component.grid.FilterDto;
+import com.vaadin.flow.component.grid.FilterFieldDto;
 
-public class TextFieldFilterDto implements FilterDto<String> {
+public class TextFieldFilterDto implements FilterFieldDto<String> {
 
 	private boolean wholeField;
 	

@@ -25,7 +25,7 @@ import com.vaadin.flow.component.HasValueAndElement;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.grid.ColumnPathRenderer;
-import com.vaadin.flow.component.grid.FilterDto;
+import com.vaadin.flow.component.grid.FilterFieldDto;
 import com.vaadin.flow.component.grid.FilterField;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
@@ -44,7 +44,7 @@ import com.vaadin.flow.function.ValueProvider;
 @CssImport(value = "./styles/enhanced-column.css")
 public class EnhancedColumn<T> extends Grid.Column<T> {
 
-	private HasValueAndElement<?, ? extends FilterDto> filter;
+	private HasValueAndElement<?, ? extends FilterFieldDto> filter;
 	
 	private ValueProvider<T, ?> valueProvider;
 	
@@ -66,7 +66,7 @@ public class EnhancedColumn<T> extends Grid.Column<T> {
 		this.grid = grid;
 	}
 	
-	public Column<T> setHeader(String labelText, HasValueAndElement<?, ? extends FilterDto> filter) {	
+	public Column<T> setHeader(String labelText, HasValueAndElement<?, ? extends FilterFieldDto> filter) {	
 		if(filter != null) {
 			Component headerComponent = new Div();
 	        headerComponent.getElement().setText(labelText);
@@ -76,14 +76,14 @@ public class EnhancedColumn<T> extends Grid.Column<T> {
 		return super.setHeader(labelText);
     }
 	
-	public Column<T> setHeader(Component headerComponent, HasValueAndElement<?, ? extends FilterDto> filter) {	
+	public Column<T> setHeader(Component headerComponent, HasValueAndElement<?, ? extends FilterFieldDto> filter) {	
 		if(filter != null) {
 			addFilterButtonToHeader(headerComponent, filter);
 		}				
 		return super.setHeader(headerComponent);		
 	}
 	
-	private void addFilterButtonToHeader(Component headerComponent, HasValueAndElement<?, ? extends FilterDto> filter) {
+	private void addFilterButtonToHeader(Component headerComponent, HasValueAndElement<?, ? extends FilterFieldDto> filter) {
 		this.filter = filter;
 		
 		// add filter button
@@ -110,7 +110,7 @@ public class EnhancedColumn<T> extends Grid.Column<T> {
         });
 	}
 
-	HasValueAndElement<?, ? extends FilterDto> getFilter() {
+	HasValueAndElement<?, ? extends FilterFieldDto> getFilter() {
 		return filter; 
 	}	
 	
