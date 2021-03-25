@@ -35,8 +35,8 @@ import com.vaadin.flow.component.ClientCallable;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.ComponentUtil;
+import com.vaadin.flow.component.grid.Filter;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.grid.GridArrayUpdater;
 import com.vaadin.flow.component.grid.GridArrayUpdater.UpdateQueueData;
 import com.vaadin.flow.component.treegrid.CollapseEvent;
@@ -50,9 +50,11 @@ import com.vaadin.flow.data.provider.DataCommunicator;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.provider.hierarchy.HasHierarchicalDataProvider;
 import com.vaadin.flow.data.provider.hierarchy.HierarchicalArrayUpdater.HierarchicalUpdate;
+import com.vaadin.flow.data.provider.hierarchy.HierarchicalConfigurableFilterDataProvider;
 import com.vaadin.flow.data.provider.hierarchy.HierarchicalDataCommunicator;
 import com.vaadin.flow.data.provider.hierarchy.HierarchicalDataProvider;
 import com.vaadin.flow.data.provider.hierarchy.HierarchicalQuery;
+import com.vaadin.flow.data.provider.hierarchy.TreeDataProvider;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.Renderer;
 import com.vaadin.flow.data.renderer.TemplateRenderer;
@@ -771,5 +773,15 @@ public class EnhancedTreeGrid<T> extends EnhancedGrid<T> implements HasHierarchi
 		    return null;
 		}
 		return (HierarchicalDataProvider<T, SerializablePredicate<T>>) super.getDataProvider();
+	}
+	
+	@Override
+	protected void applyFilterPredicate(SerializablePredicate<T> finalPredicate) {
+		DataProvider<T, ?> dataProvider = getDataProvider();
+		if(dataProvider instanceof TreeDataProvider<?>) {
+			((TreeDataProvider<T>)dataProvider).setFilter(finalPredicate);
+		} else if(dataProvider instanceof HierarchicalConfigurableFilterDataProvider) {
+			((HierarchicalConfigurableFilterDataProvider<T, Void, Filter>)dataProvider).setFilter(new Filter<T>(finalPredicate));
+		}
 	}
 }
