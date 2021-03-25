@@ -76,67 +76,67 @@ public class EnhancedTreeGrid<T> extends EnhancedGrid<T> implements HasHierarchi
 	private static final class TreeGridUpdateQueue extends UpdateQueue
     implements HierarchicalUpdate {
 
-	private TreeGridUpdateQueue(UpdateQueueData data, int size) {
-	    super(data, size);
-	}
-	
-	@Override
-	public void set(int start, List<JsonValue> items, String parentKey) {
-	    enqueue("$connector.set", start,
-	            items.stream().collect(JsonUtils.asArray()), parentKey);
-	}
-	
-	@Override
-	public void clear(int start, int length) {
-	    if (!getData().getHasExpandedItems().get()) {
-	        enqueue("$connector.clearExpanded");
-	    }
-	    super.clear(start, length);
-	}
-	
-	@Override
-	public void clear(int start, int length, String parentKey) {
-	    enqueue("$connector.clear", start, length, parentKey);
-	}
-	
-	@Override
-	public void commit(int updateId, String parentKey, int levelSize) {
-	    enqueue("$connector.confirmParent", updateId, parentKey, levelSize);
-	    commit();
-	}
+		private TreeGridUpdateQueue(UpdateQueueData data, int size) {
+		    super(data, size);
+		}
+		
+		@Override
+		public void set(int start, List<JsonValue> items, String parentKey) {
+		    enqueue("$connector.set", start,
+		            items.stream().collect(JsonUtils.asArray()), parentKey);
+		}
+		
+		@Override
+		public void clear(int start, int length) {
+		    if (!getData().getHasExpandedItems().get()) {
+		        enqueue("$connector.clearExpanded");
+		    }
+		    super.clear(start, length);
+		}
+		
+		@Override
+		public void clear(int start, int length, String parentKey) {
+		    enqueue("$connector.clear", start, length, parentKey);
+		}
+		
+		@Override
+		public void commit(int updateId, String parentKey, int levelSize) {
+		    enqueue("$connector.confirmParent", updateId, parentKey, levelSize);
+		    commit();
+		}
 	}
 	
 	private class TreeGridArrayUpdaterImpl implements TreeGridArrayUpdater {
-	private UpdateQueueData data;
-	private SerializableBiFunction<UpdateQueueData, Integer, UpdateQueue> updateQueueFactory;
-	
-	public TreeGridArrayUpdaterImpl(
-	        SerializableBiFunction<UpdateQueueData, Integer, UpdateQueue> updateQueueFactory) {
-	    this.updateQueueFactory = updateQueueFactory;
-	}
-	
-	@Override
-	public TreeGridUpdateQueue startUpdate(int sizeChange) {
-	    return (TreeGridUpdateQueue) updateQueueFactory.apply(data,
-	            sizeChange);
-	}
-	
-	@Override
-	public void initialize() {
-	    initConnector();
-	    updateSelectionModeOnClient();
-	    getDataCommunicator().setRequestedRange(0, getPageSize());
-	}
-	
-	@Override
-	public void setUpdateQueueData(UpdateQueueData data) {
-	    this.data = data;
-	}
-	
-	@Override
-	public UpdateQueueData getUpdateQueueData() {
-	    return data;
-	}
+		private UpdateQueueData data;
+		private SerializableBiFunction<UpdateQueueData, Integer, UpdateQueue> updateQueueFactory;
+		
+		public TreeGridArrayUpdaterImpl(
+		        SerializableBiFunction<UpdateQueueData, Integer, UpdateQueue> updateQueueFactory) {
+		    this.updateQueueFactory = updateQueueFactory;
+		}
+		
+		@Override
+		public TreeGridUpdateQueue startUpdate(int sizeChange) {
+		    return (TreeGridUpdateQueue) updateQueueFactory.apply(data,
+		            sizeChange);
+		}
+		
+		@Override
+		public void initialize() {
+		    initConnector();
+		    updateSelectionModeOnClient();
+		    getDataCommunicator().setRequestedRange(0, getPageSize());
+		}
+		
+		@Override
+		public void setUpdateQueueData(UpdateQueueData data) {
+		    this.data = data;
+		}
+		
+		@Override
+		public UpdateQueueData getUpdateQueueData() {
+		    return data;
+		}
 	}
 	
 	private final ValueProvider<T, String> defaultUniqueKeyProvider = item -> String
@@ -151,11 +151,11 @@ public class EnhancedTreeGrid<T> extends EnhancedGrid<T> implements HasHierarchi
 	* automatically sets up columns based on the type of presented data.
 	*/
 	public EnhancedTreeGrid() {
-	super(50, TreeGridUpdateQueue::new,
-	        new TreeDataCommunicatorBuilder<T>());
-	
-	setUniqueKeyProperty("key");
-	getArrayUpdater().getUpdateQueueData()
+		super(50, TreeGridUpdateQueue::new,
+		        new TreeDataCommunicatorBuilder<T>());
+		
+		setUniqueKeyProperty("key");
+		getArrayUpdater().getUpdateQueueData()
 	        .setHasExpandedItems(getDataCommunicator()::hasExpandedItems);
 	}
 	
@@ -170,18 +170,18 @@ public class EnhancedTreeGrid<T> extends EnhancedGrid<T> implements HasHierarchi
 	*            the bean type to use, not {@code null}
 	*/
 	public EnhancedTreeGrid(Class<T> beanType) {
-	super(beanType, TreeGridUpdateQueue::new,
-	        new TreeDataCommunicatorBuilder<T>());
-	
-	setUniqueKeyProperty("key");
-	getArrayUpdater().getUpdateQueueData()
+		super(beanType, TreeGridUpdateQueue::new,
+		        new TreeDataCommunicatorBuilder<T>());
+		
+		setUniqueKeyProperty("key");
+		getArrayUpdater().getUpdateQueueData()
 	        .setHasExpandedItems(getDataCommunicator()::hasExpandedItems);
 	}
 	
 	@Override
 	protected GridArrayUpdater createDefaultArrayUpdater(
 	    SerializableBiFunction<UpdateQueueData, Integer, UpdateQueue> updateQueueFactory) {
-	return new TreeGridArrayUpdaterImpl(updateQueueFactory);
+		return new TreeGridArrayUpdaterImpl(updateQueueFactory);
 	}
 	
 	/**
@@ -230,10 +230,10 @@ public class EnhancedTreeGrid<T> extends EnhancedGrid<T> implements HasHierarchi
 	*/
 	public void setUniqueKeyDataGenerator(String propertyName,
 	    ValueProvider<T, String> uniqueKeyProvider) {
-	setUniqueKeyProperty(propertyName);
-	setUniqueKeyProvider(uniqueKeyProvider);
-	
-	getDataProvider().refreshAll();
+		setUniqueKeyProperty(propertyName);
+		setUniqueKeyProvider(uniqueKeyProvider);
+		
+		getDataProvider().refreshAll();
 	}
 	
 	/**
@@ -243,7 +243,7 @@ public class EnhancedTreeGrid<T> extends EnhancedGrid<T> implements HasHierarchi
 	*/
 	@Override
 	protected ValueProvider<T, String> getUniqueKeyProvider() {
-	return Optional.ofNullable(super.getUniqueKeyProvider())
+		return Optional.ofNullable(super.getUniqueKeyProvider())
 	        .orElse(defaultUniqueKeyProvider);
 	}
 	
@@ -259,7 +259,7 @@ public class EnhancedTreeGrid<T> extends EnhancedGrid<T> implements HasHierarchi
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public Registration addExpandListener(
 	    ComponentEventListener<ExpandEvent<T, EnhancedTreeGrid<T>>> listener) {
-	return ComponentUtil.addListener(this, ExpandEvent.class,
+		return ComponentUtil.addListener(this, ExpandEvent.class,
 	        (ComponentEventListener) listener);
 	}
 	
@@ -275,27 +275,27 @@ public class EnhancedTreeGrid<T> extends EnhancedGrid<T> implements HasHierarchi
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public Registration addCollapseListener(
 	    ComponentEventListener<CollapseEvent<T, EnhancedTreeGrid<T>>> listener) {
-	return ComponentUtil.addListener(this, CollapseEvent.class,
+		return ComponentUtil.addListener(this, CollapseEvent.class,
 	        (ComponentEventListener) listener);
 	}
 	
 	@Override
 	public void setDataProvider(DataProvider<T, ?> dataProvider) {
-	if (!(dataProvider instanceof HierarchicalDataProvider)) {
-	    throw new IllegalArgumentException(
-	            "TreeGrid only accepts hierarchical data providers. "
-	                    + "An example of interface to be used: HierarchicalDataProvider");
-	}
-	if (dataProviderRegistration != null) {
-	    dataProviderRegistration.remove();
-	}
-	dataProviderRegistration = dataProvider.addDataProviderListener(e -> {
-	    if (!(e instanceof DataChangeEvent.DataRefreshEvent)) {
-	        // refreshAll was called
-	        getElement().callJsFunction("$connector.reset");
-	    }
-	});
-	super.setDataProvider(dataProvider);
+		if (!(dataProvider instanceof HierarchicalDataProvider)) {
+		    throw new IllegalArgumentException(
+		            "TreeGrid only accepts hierarchical data providers. "
+		                    + "An example of interface to be used: HierarchicalDataProvider");
+		}
+		if (dataProviderRegistration != null) {
+		    dataProviderRegistration.remove();
+		}
+		dataProviderRegistration = dataProvider.addDataProviderListener(e -> {
+		    if (!(e instanceof DataChangeEvent.DataRefreshEvent)) {
+		        // refreshAll was called
+		        getElement().callJsFunction("$connector.reset");
+		    }
+		});
+		super.setDataProvider(dataProvider);
 	}
 	
 	/**
@@ -311,18 +311,18 @@ public class EnhancedTreeGrid<T> extends EnhancedGrid<T> implements HasHierarchi
 	* @return the created hierarchy column
 	*/
 	public Column<T> addHierarchyColumn(ValueProvider<T, ?> valueProvider) {
-	Column<T> column = addColumn(TemplateRenderer
-	        .<T> of("<vaadin-grid-tree-toggle "
-	                + "leaf='[[item.leaf]]' expanded='{{expanded}}' level='[[level]]'>[[item.name]]"
-	                + "</vaadin-grid-tree-toggle>")
-	        .withProperty("leaf",
-	                item -> !getDataCommunicator().hasChildren(item))
-	        .withProperty("name",
-	                value -> String.valueOf(valueProvider.apply(value))));
-	final SerializableComparator<T> comparator = 
-	        (a, b) -> compareMaybeComparables(valueProvider.apply(a),
-	                valueProvider.apply(b));
-	column.setComparator(comparator);
+		Column<T> column = addColumn(TemplateRenderer
+		        .<T> of("<vaadin-grid-tree-toggle "
+		                + "leaf='[[item.leaf]]' expanded='{{expanded}}' level='[[level]]'>[[item.name]]"
+		                + "</vaadin-grid-tree-toggle>")
+		        .withProperty("leaf",
+		                item -> !getDataCommunicator().hasChildren(item))
+		        .withProperty("name",
+		                value -> String.valueOf(valueProvider.apply(value))));
+		final SerializableComparator<T> comparator = 
+		        (a, b) -> compareMaybeComparables(valueProvider.apply(a),
+		                valueProvider.apply(b));
+		column.setComparator(comparator);
 	
 	return column;
 	}
@@ -345,7 +345,7 @@ public class EnhancedTreeGrid<T> extends EnhancedGrid<T> implements HasHierarchi
 	*/
 	public <V extends Component> Column<T> addComponentHierarchyColumn(
 	    ValueProvider<T, V> componentProvider) {
-	return addColumn(new HierarchyColumnComponentRenderer<V, T>(
+		return addColumn(new HierarchyColumnComponentRenderer<V, T>(
 	        componentProvider).withProperty("leaf",
 	                item -> !getDataCommunicator().hasChildren(item)));
 	}
@@ -374,7 +374,7 @@ public class EnhancedTreeGrid<T> extends EnhancedGrid<T> implements HasHierarchi
 	* @return the created hierarchy column
 	*/
 	public Column<T> setHierarchyColumn(String propertyName) {
-	return setHierarchyColumn(propertyName, null);
+		return setHierarchyColumn(propertyName, null);
 	}
 	
 	/**
@@ -403,11 +403,11 @@ public class EnhancedTreeGrid<T> extends EnhancedGrid<T> implements HasHierarchi
 	*/
 	public Column<T> setHierarchyColumn(String propertyName,
 	    ValueProvider<T, ?> valueProvider) {
-	List<String> currentPropertyList = getColumns().stream()
-	        .map(Column::getKey).filter(Objects::nonNull)
-	        .collect(Collectors.toList());
-	resetColumns(propertyName, valueProvider, currentPropertyList);
-	return getColumnByKey(propertyName);
+		List<String> currentPropertyList = getColumns().stream()
+		        .map(Column::getKey).filter(Objects::nonNull)
+		        .collect(Collectors.toList());
+		resetColumns(propertyName, valueProvider, currentPropertyList);
+		return getColumnByKey(propertyName);
 	}
 	
 	/**
@@ -438,111 +438,111 @@ public class EnhancedTreeGrid<T> extends EnhancedGrid<T> implements HasHierarchi
 	public Column<T> setColumns(String hierarchyPropertyName,
 	    ValueProvider<T, ?> valueProvider,
 	    Collection<String> propertyNames) {
-	if (getPropertySet() == null) {
-	    throw new UnsupportedOperationException(
-	            "This method can't be used for a Grid that isn't constructed from a bean type. "
-	                + "To construct Grid from a bean type, please provide a beanType argument"
-	                + "to the constructor: Grid<Person> grid = new Grid<>(Person.class)");
-	}
-	resetColumns(hierarchyPropertyName, valueProvider, propertyNames);
-	return getColumnByKey(hierarchyPropertyName);
+		if (getPropertySet() == null) {
+		    throw new UnsupportedOperationException(
+		            "This method can't be used for a Grid that isn't constructed from a bean type. "
+		                + "To construct Grid from a bean type, please provide a beanType argument"
+		                + "to the constructor: Grid<Person> grid = new Grid<>(Person.class)");
+		}
+		resetColumns(hierarchyPropertyName, valueProvider, propertyNames);
+		return getColumnByKey(hierarchyPropertyName);
 	}
 	
 	private void resetColumns(String hierarchyPropertyName,
 	    ValueProvider<T, ?> valueProvider,
 	    Collection<String> propertyList) {
-	getColumns().forEach(this::removeColumn);
-	propertyList.stream().distinct().forEach(
-	        key -> addColumn(key, hierarchyPropertyName, valueProvider));
+		getColumns().forEach(this::removeColumn);
+		propertyList.stream().distinct().forEach(
+		        key -> addColumn(key, hierarchyPropertyName, valueProvider));
 	}
 	
 	private void addColumn(String key, String hierarchyPropertyName,
 	    ValueProvider<T, ?> valueProvider) {
-	if (key.equals(hierarchyPropertyName)) {
-	    addHierarchyColumn(hierarchyPropertyName, valueProvider);
-	} else {
-	    addColumn(key);
-	}
+		if (key.equals(hierarchyPropertyName)) {
+		    addHierarchyColumn(hierarchyPropertyName, valueProvider);
+		} else {
+		    addColumn(key);
+		}
 	}
 	
 	private void addHierarchyColumn(String hierarchyPropertyName,
 	    ValueProvider<T, ?> valueProvider) {
-	if (valueProvider != null) {
-	    addHierarchyColumn(valueProvider).setKey(hierarchyPropertyName);
-	} else {
-	    addHierarchyColumn(hierarchyPropertyName);
-	}
+		if (valueProvider != null) {
+		    addHierarchyColumn(valueProvider).setKey(hierarchyPropertyName);
+		} else {
+		    addHierarchyColumn(hierarchyPropertyName);
+		}
 	}
 	
 	private Column<T> addHierarchyColumn(String propertyName) {
-	if (getPropertySet() == null) {
-	    throw new UnsupportedOperationException(
-	            "This method can't be used for a Grid that isn't constructed from a bean type. "
-	                + "To construct Grid from a bean type, please provide a beanType argument"
-	                + "to the constructor: Grid<Person> grid = new Grid<>(Person.class)");
-	}
-	Objects.requireNonNull(propertyName,
-	        "Hierarchy Property name can't be null");
-	
-	PropertyDefinition<T, ?> property;
-	try {
-	    property = getPropertySet().getProperty(propertyName).get();
-	} catch (NoSuchElementException | IllegalArgumentException exception) {
-	    throw new IllegalArgumentException(
-	            "There is no such hierarchy property name in the beanType used "
-	                + "for construction of the grid:"
-	                + "Trying to get '" + propertyName + "' from '" + getPropertySet() + "'");
-	}
-	return addHierarchyColumn(property);
+		if (getPropertySet() == null) {
+		    throw new UnsupportedOperationException(
+		            "This method can't be used for a Grid that isn't constructed from a bean type. "
+		                + "To construct Grid from a bean type, please provide a beanType argument"
+		                + "to the constructor: Grid<Person> grid = new Grid<>(Person.class)");
+		}
+		Objects.requireNonNull(propertyName,
+		        "Hierarchy Property name can't be null");
+		
+		PropertyDefinition<T, ?> property;
+		try {
+		    property = getPropertySet().getProperty(propertyName).get();
+		} catch (NoSuchElementException | IllegalArgumentException exception) {
+		    throw new IllegalArgumentException(
+		            "There is no such hierarchy property name in the beanType used "
+		                + "for construction of the grid:"
+		                + "Trying to get '" + propertyName + "' from '" + getPropertySet() + "'");
+		}
+		return addHierarchyColumn(property);
 	}
 	
 	private Column<T> addHierarchyColumn(PropertyDefinition<T, ?> property) {
-	Column<T> column = addHierarchyColumn(
-	        item -> String.valueOf(property.getGetter().apply(item)))
-	                .setHeader(property.getCaption());
-	try {
-	    return column.setKey(property.getName());
-	} catch (IllegalArgumentException exception) {
-	    throw new IllegalArgumentException(
-	            "Multiple columns for the same property: "
-	                    + property.getName());
-	}
+		Column<T> column = addHierarchyColumn(
+		        item -> String.valueOf(property.getGetter().apply(item)))
+		                .setHeader(property.getCaption());
+		try {
+		    return column.setKey(property.getName());
+		} catch (IllegalArgumentException exception) {
+		    throw new IllegalArgumentException(
+		            "Multiple columns for the same property: "
+		                    + property.getName());
+		}
 	}
 	
 	@ClientCallable(DisabledUpdateMode.ALWAYS)
 	private void setParentRequestedRange(int start, int length,
 	    String parentKey) {
-	T item = getDataCommunicator().getKeyMapper().get(parentKey);
-	if (item != null) {
-	    getDataCommunicator().setParentRequestedRange(start, length, item);
-	}
+		T item = getDataCommunicator().getKeyMapper().get(parentKey);
+		if (item != null) {
+		    getDataCommunicator().setParentRequestedRange(start, length, item);
+		}
 	}
 	
 	@ClientCallable(DisabledUpdateMode.ALWAYS)
 	private void setParentRequestedRanges(JsonArray array) {
-	for (int index = 0; index < array.length(); index++) {
-	    JsonObject object = array.getObject(index);
-	    setParentRequestedRange((int) object.getNumber("firstIndex"),
-	            (int) object.getNumber("size"),
-	            object.getString("parentKey"));
-	}
+		for (int index = 0; index < array.length(); index++) {
+		    JsonObject object = array.getObject(index);
+		    setParentRequestedRange((int) object.getNumber("firstIndex"),
+		            (int) object.getNumber("size"),
+		            object.getString("parentKey"));
+		}
 	}
 	
 	@ClientCallable(DisabledUpdateMode.ONLY_WHEN_ENABLED)
 	private void updateExpandedState(String key, boolean expanded) {
-	T item = getDataCommunicator().getKeyMapper().get(key);
-	if (item != null) {
-	    if (expanded) {
-	        expand(Arrays.asList(item), true);
-	    } else {
-	        collapse(Arrays.asList(item), true);
-	    }
-	}
+		T item = getDataCommunicator().getKeyMapper().get(key);
+		if (item != null) {
+		    if (expanded) {
+		        expand(Arrays.asList(item), true);
+		    } else {
+		        collapse(Arrays.asList(item), true);
+		    }
+		}
 	}
 	
 	@ClientCallable(DisabledUpdateMode.ALWAYS)
 	private void confirmParentUpdate(int id, String parentKey) {
-	getDataCommunicator().confirmUpdate(id, parentKey);
+		getDataCommunicator().confirmUpdate(id, parentKey);
 	}
 	
 	/**
@@ -556,7 +556,7 @@ public class EnhancedTreeGrid<T> extends EnhancedGrid<T> implements HasHierarchi
 	*/
 	@SuppressWarnings("unchecked")
 	public void expand(T... items) {
-	expand(Arrays.asList(items));
+		expand(Arrays.asList(items));
 	}
 	
 	/**
@@ -569,7 +569,7 @@ public class EnhancedTreeGrid<T> extends EnhancedGrid<T> implements HasHierarchi
 	*            the items to expand
 	*/
 	public void expand(Collection<T> items) {
-	expand(items, false);
+		expand(items, false);
 	}
 	
 	/**
@@ -582,8 +582,8 @@ public class EnhancedTreeGrid<T> extends EnhancedGrid<T> implements HasHierarchi
 	*            operation is user originated, {@code false} otherwise.
 	*/
 	protected void expand(Collection<T> items, boolean userOriginated) {
-	Collection<T> expandedItems = getDataCommunicator().expand(items);
-	fireEvent(new ExpandEvent<T, EnhancedTreeGrid<T>>(this, userOriginated,
+		Collection<T> expandedItems = getDataCommunicator().expand(items);
+		fireEvent(new ExpandEvent<T, EnhancedTreeGrid<T>>(this, userOriginated,
 	        expandedItems));
 	}
 	
@@ -605,7 +605,7 @@ public class EnhancedTreeGrid<T> extends EnhancedGrid<T> implements HasHierarchi
 	* @since 8.4
 	*/
 	public void expandRecursively(Stream<T> items, int depth) {
-	expandRecursively(items.collect(Collectors.toList()), depth);
+		expandRecursively(items.collect(Collectors.toList()), depth);
 	}
 	
 	/**
@@ -626,7 +626,7 @@ public class EnhancedTreeGrid<T> extends EnhancedGrid<T> implements HasHierarchi
 	* @since 8.4
 	*/
 	public void expandRecursively(Collection<T> items, int depth) {
-	getDataCommunicator()
+		getDataCommunicator()
 	        .expand(getItemsWithChildrenRecursively(items, depth));
 	}
 	
@@ -640,7 +640,7 @@ public class EnhancedTreeGrid<T> extends EnhancedGrid<T> implements HasHierarchi
 	*/
 	@SuppressWarnings("unchecked")
 	public void collapse(T... items) {
-	collapse(Arrays.asList(items));
+		collapse(Arrays.asList(items));
 	}
 	
 	/**
@@ -652,7 +652,7 @@ public class EnhancedTreeGrid<T> extends EnhancedGrid<T> implements HasHierarchi
 	*            the collection of items to collapse
 	*/
 	public void collapse(Collection<T> items) {
-	collapse(items, false);
+		collapse(items, false);
 	}
 	
 	/**
@@ -665,8 +665,8 @@ public class EnhancedTreeGrid<T> extends EnhancedGrid<T> implements HasHierarchi
 	*            operation is user originated, {@code false} otherwise.
 	*/
 	protected void collapse(Collection<T> items, boolean userOriginated) {
-	Collection<T> collapsedItems = getDataCommunicator().collapse(items);
-	fireEvent(new CollapseEvent<T, EnhancedTreeGrid<T>>(this, userOriginated,
+		Collection<T> collapsedItems = getDataCommunicator().collapse(items);
+		fireEvent(new CollapseEvent<T, EnhancedTreeGrid<T>>(this, userOriginated,
 	        collapsedItems));
 	}
 	
@@ -688,7 +688,7 @@ public class EnhancedTreeGrid<T> extends EnhancedGrid<T> implements HasHierarchi
 	* @since 8.4
 	*/
 	public void collapseRecursively(Stream<T> items, int depth) {
-	collapseRecursively(items.collect(Collectors.toList()), depth);
+		collapseRecursively(items.collect(Collectors.toList()), depth);
 	}
 	
 	/**
@@ -709,7 +709,7 @@ public class EnhancedTreeGrid<T> extends EnhancedGrid<T> implements HasHierarchi
 	* @since 8.4
 	*/
 	public void collapseRecursively(Collection<T> items, int depth) {
-	getDataCommunicator()
+		getDataCommunicator()
 	        .collapse(getItemsWithChildrenRecursively(items, depth));
 	}
 	
@@ -732,20 +732,20 @@ public class EnhancedTreeGrid<T> extends EnhancedGrid<T> implements HasHierarchi
 	*/
 	protected Collection<T> getItemsWithChildrenRecursively(Collection<T> items,
 	    int depth) {
-	List<T> itemsWithChildren = new ArrayList<>();
-	if (depth < 0) {
-	    return itemsWithChildren;
-	}
-	items.stream().filter(getDataCommunicator()::hasChildren)
-	        .forEach(item -> {
-	            itemsWithChildren.add(item);
-	            itemsWithChildren.addAll(
-	                    getItemsWithChildrenRecursively(getDataProvider()
-	                            .fetchChildren(
-	                                    new HierarchicalQuery<>(null, item))
-	                            .collect(Collectors.toList()), depth - 1));
-	        });
-	return itemsWithChildren;
+		List<T> itemsWithChildren = new ArrayList<>();
+		if (depth < 0) {
+		    return itemsWithChildren;
+		}
+		items.stream().filter(getDataCommunicator()::hasChildren)
+		        .forEach(item -> {
+		            itemsWithChildren.add(item);
+		            itemsWithChildren.addAll(
+		                    getItemsWithChildrenRecursively(getDataProvider()
+		                            .fetchChildren(
+		                                    new HierarchicalQuery<>(null, item))
+		                            .collect(Collectors.toList()), depth - 1));
+		        });
+		return itemsWithChildren;
 	}
 	
 	/**
@@ -756,20 +756,20 @@ public class EnhancedTreeGrid<T> extends EnhancedGrid<T> implements HasHierarchi
 	* @return true if the item is expanded, false if collapsed
 	*/
 	public boolean isExpanded(T item) {
-	return getDataCommunicator().isExpanded(item);
+		return getDataCommunicator().isExpanded(item);
 	}
 	
 	@Override
 	public HierarchicalDataCommunicator<T> getDataCommunicator() {
-	return (HierarchicalDataCommunicator<T>) super.getDataCommunicator();
+		return (HierarchicalDataCommunicator<T>) super.getDataCommunicator();
 	}
 	
 	@SuppressWarnings("unchecked")
 	@Override
 	public HierarchicalDataProvider<T, SerializablePredicate<T>> getDataProvider() {
-	if (!(super.getDataProvider() instanceof HierarchicalDataProvider)) {
-	    return null;
+		if (!(super.getDataProvider() instanceof HierarchicalDataProvider)) {
+		    return null;
+		}
+		return (HierarchicalDataProvider<T, SerializablePredicate<T>>) super.getDataProvider();
 	}
-	return (HierarchicalDataProvider<T, SerializablePredicate<T>>) super.getDataProvider();
-	}
-	}
+}
