@@ -43,6 +43,8 @@ import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
 import com.vaadin.flow.data.provider.DataGenerator;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.provider.ListDataProvider;
+import com.vaadin.flow.data.provider.hierarchy.AbstractBackEndHierarchicalDataProvider;
+import com.vaadin.flow.data.provider.hierarchy.TreeDataProvider;
 import com.vaadin.flow.data.renderer.Renderer;
 import com.vaadin.flow.data.selection.SelectionEvent;
 import com.vaadin.flow.function.SerializableBiFunction;
@@ -376,14 +378,23 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver, App
 			return true;
 		};
 		
+		applyFilterPredicate(finalPredicate);		
+	}	
+	
+	/**
+	 * Apply filter predicate depending on the data provider
+	 * 
+	 * @param finalPredicate
+	 */
+	protected void applyFilterPredicate(SerializablePredicate<T> finalPredicate) {
 		DataProvider<T, ?> dataProvider = getDataProvider();
 		if(dataProvider instanceof ListDataProvider<?>) {				
-			((ListDataProvider<T>)dataProvider).setFilter(finalPredicate);		
+			((ListDataProvider<T>)dataProvider).setFilter(finalPredicate);	
 		} else if(dataProvider instanceof ConfigurableFilterDataProvider){
-			((ConfigurableFilterDataProvider<T,Void,Filter>)dataProvider).setFilter(new Filter(finalPredicate));
-		}		
-	}	
-
+			((ConfigurableFilterDataProvider<T, Void, Filter>)dataProvider).setFilter(new Filter<T>(finalPredicate));
+		}
+	}
+	
 	/**
 	 * Clear all selected filters and updates the displayed data.
 	 * 
