@@ -1,5 +1,6 @@
 package com.vaadin.componentfactory.enhancedgrid;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -12,6 +13,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Filter;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
+import com.vaadin.flow.component.grid.GridSortOrder;
 import com.vaadin.flow.component.grid.editor.Editor;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Paragraph;
@@ -41,14 +43,14 @@ public class LazySingleSelectView extends Div {
         PersonService personService = new PersonService();
                 
         ConfigurableFilterDataProvider<Person,Void,Filter<Person>> dataProvider =
-        		DataProvider.<Person, Filter<Person>>fromFilteringCallbacks(
-    	                query -> {
-    	                	List<PersonSort> sortOrders = query.getSortOrders().stream()
-    	                			.map(sortOrder -> new PersonSort(sortOrder.getSorted(), sortOrder.getDirection().equals(SortDirection.ASCENDING)))
-    	                			.collect(Collectors.toList());
-    	                	return personService.fetchPersons(query.getOffset(), query.getLimit(), query.getFilter(), sortOrders);
-    	                },
-    	                query -> (int) personService.getPersonCount(query.getFilter())).withConfigurableFilter();
+    		DataProvider.<Person, Filter<Person>>fromFilteringCallbacks(
+                query -> {
+                	List<PersonSort> sortOrders = query.getSortOrders().stream()
+                			.map(sortOrder -> new PersonSort(sortOrder.getSorted(), sortOrder.getDirection().equals(SortDirection.ASCENDING)))
+                			.collect(Collectors.toList());
+                	return personService.fetchPersons(query.getOffset(), query.getLimit(), query.getFilter(), sortOrders);
+                },
+                query -> (int) personService.getPersonCount(query.getFilter())).withConfigurableFilter();
         
         EnhancedGrid<Person> grid = new EnhancedGrid<>();
         grid.setDataProvider(dataProvider);
@@ -65,6 +67,12 @@ public class LazySingleSelectView extends Div {
         // age column 
         grid.addColumn(Person::getAge).setHeader("Age").setSortProperty(PersonSort.AGE);
                  
+        // add ascending sorting for first name column
+        grid.sort(Arrays.asList(new GridSortOrder<Person>(firstNameColumn, SortDirection.ASCENDING)));
+        
+		// set multisort
+		grid.setMultiSort(true);
+        
         // select selection mode
         grid.setSelectionMode(Grid.SelectionMode.SINGLE);
 
