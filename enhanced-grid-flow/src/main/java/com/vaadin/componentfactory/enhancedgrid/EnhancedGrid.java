@@ -309,8 +309,8 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver, App
 	}
     
 	/**
-	 * {@link CancelEditConfirmDialog} will be displayed if showCancelEditDialog is true
-	 * && editor is in buffered mode.
+	 * {@link CancelEditConfirmDialog} will be displayed if showCancelEditDialog 
+	 * is true and editor is in buffered mode.
 	 * 
 	 * @return
 	 */
@@ -397,6 +397,6 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver, App
 		}
 		applyFilter();		
 	}
-		
+
 }
 
