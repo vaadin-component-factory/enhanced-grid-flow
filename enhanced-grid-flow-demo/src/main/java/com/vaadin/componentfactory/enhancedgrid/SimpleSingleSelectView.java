@@ -13,19 +13,24 @@ import com.vaadin.flow.component.grid.GridSortOrder;
 import com.vaadin.flow.component.grid.GridSortOrderBuilder;
 import com.vaadin.flow.component.grid.editor.Editor;
 import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.RouteAlias;
 
 /**
- * Basic single selection grid example with setItems
+ * Basic single selection grid example with setItems, editing, filtering and sorting.
  */
-@Route(value = "single", layout = MainLayout.class)
+@Route(value = "", layout = MainLayout.class)
+@RouteAlias(value = "single-grid", layout = MainLayout.class)
 public class SimpleSingleSelectView extends Div {
 
     public SimpleSingleSelectView() {
+    	add(new Paragraph("Basic single selection grid example with editing, filtering and sorting"));    	
+    	
         Div messageDiv = new Div();
 
         List<Person> personList = getItems();
@@ -106,14 +111,13 @@ public class SimpleSingleSelectView extends Div {
         // add layout for buttons
         HorizontalLayout horizontalLayout = new HorizontalLayout();
         horizontalLayout.setWidthFull();
+        horizontalLayout.setJustifyContentMode(JustifyContentMode.END);
         // add button to clear all selected filters
         Button clearFiltersButton = new Button("Clear Filters", e -> grid.clearAllFilters());
-        horizontalLayout.setJustifyContentMode(JustifyContentMode.END);
         horizontalLayout.add(clearFiltersButton);
         // add button to clear all sorting
         Button clearSortingButton = new Button("Clear Sorting", e -> grid.sort(null));
-        horizontalLayout.setJustifyContentMode(JustifyContentMode.END);
-        horizontalLayout.add(clearSortingButton);
+        horizontalLayout.add(clearSortingButton);            
  
         add(grid, messageDiv, horizontalLayout);
     }

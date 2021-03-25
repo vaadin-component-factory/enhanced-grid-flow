@@ -1,11 +1,19 @@
 package com.vaadin.componentfactory.enhancedgrid;
 
 import com.vaadin.componentfactory.enhancedgrid.bean.Person;
+import com.vaadin.componentfactory.enhancedgrid.filtering.TextFieldFilterDto;
+import com.vaadin.componentfactory.enhancedgrid.filtering.TextFilterField;
 import com.vaadin.componentfactory.enhancedgrid.service.PersonService;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.GridSortOrder;
+import com.vaadin.flow.component.grid.GridSortOrderBuilder;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.grid.editor.Editor;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.Paragraph;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.Route;
@@ -13,12 +21,14 @@ import com.vaadin.flow.router.Route;
 import java.util.List;
 
 /**
- * Basic multiple selection grid example with setItems
+ * Basic multiple selection grid example with setItems, editing, filtering and sorting.
  */
-@Route(value = "", layout = MainLayout.class)
+@Route(value = "multi-grid", layout = MainLayout.class)
 public class SimpleMultiSelectView extends Div {
 
     public SimpleMultiSelectView() {
+    	add(new Paragraph("Basic multiple selection grid example with editing, filtering and sorting"));
+    	
         Div messageDiv = new Div();
 
         // set items
@@ -30,9 +40,19 @@ public class SimpleMultiSelectView extends Div {
         grid.setItems(personList);
 
         // add columns
-        Column<Person> firstNameColumn = grid.addColumn(Person::getFirstName).setHeader("First Name");
-        grid.addColumn(Person::getAge).setHeader("Age");
+        // first name column with filtering button on header
+        Column<Person> firstNameColumn = grid.addColumn(Person::getFirstName).setHeader("First Name", new TextFilterField());
+        // last name column with filtering button and pre-selected filter by last name = "Allen"
+        grid.addColumn(Person::getLastName).setHeader("Last Name", new TextFilterField(new TextFieldFilterDto("Allen")));
+        // age column 
+        Column<Person> ageColumn = grid.addColumn(Person::getAge).setHeader("Age");
+        ageColumn.setSortable(true);
 
+        // add pre-selected descendent order for first name column
+        List<GridSortOrder<Person>> sortByFirstName = new GridSortOrderBuilder<Person>()
+    	      .thenAsc(firstNameColumn).build();
+    	grid.sort(sortByFirstName);        
+        
         // set selection mode
         grid.setSelectionMode(Grid.SelectionMode.MULTI);
 
@@ -66,10 +86,21 @@ public class SimpleMultiSelectView extends Div {
         
         // cancel edit
         grid.getElement().addEventListener("keyup",
-                event -> grid.getEditor().cancel())
+                event -> editor.cancel())
         .setFilter("event.key === 'Escape' || event.key === 'Esc'");
         
-        add(grid, messageDiv);
+        // add layout for buttons
+        HorizontalLayout horizontalLayout = new HorizontalLayout();
+        horizontalLayout.setWidthFull();
+        horizontalLayout.setJustifyContentMode(JustifyContentMode.END);
+        // add button to clear all selected filters
+        Button clearFiltersButton = new Button("Clear Filters", e -> grid.clearAllFilters());
+        horizontalLayout.add(clearFiltersButton);
+        // add button to clear all sorting
+        Button clearSortingButton = new Button("Clear Sorting", e -> grid.sort(null));
+        horizontalLayout.add(clearSortingButton);            
+        
+        add(grid, horizontalLayout, messageDiv);
     }
 
     private List<Person> getItems() {

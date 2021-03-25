@@ -76,14 +76,14 @@ public class TextFieldFilterDto implements FilterFieldDto<String> {
 	
 	@Override
 	public Predicate<String> getFilterPredicate() {
-		Predicate<String> simplePredicate = StringUtils.isNotBlank(filterValue) ? s -> filterValue.equalsIgnoreCase(s) : s -> true;
+		Predicate<String> simplePredicate = StringUtils.isNotBlank(filterValue) ? s -> s.contains(filterValue) : s -> true;
 		if(regularExpression) {
 			simplePredicate = s -> s.matches(filterValue);
 			// TODO 			
 		} else if(wholeField){			
-			simplePredicate = caseSensitive ? s -> filterValue.equals(s) : s -> filterValue.equalsIgnoreCase(s);			
+			simplePredicate = caseSensitive ? s -> s.equals(filterValue) : s -> s.equalsIgnoreCase(filterValue);			
 		} else if(caseSensitive) {
-			simplePredicate = s -> filterValue.equals(s);
+			simplePredicate = s -> s.equals(filterValue);
 		} 
 			
 		return invertResult ? simplePredicate.negate() : simplePredicate;		

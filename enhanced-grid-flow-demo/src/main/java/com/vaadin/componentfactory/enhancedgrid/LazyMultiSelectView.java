@@ -8,20 +8,23 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.grid.editor.Editor;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.router.Route;
 
 /**
- * Multiple selection grid example with lazy loading
+ * Multiple selection grid example with lazy loading and editing.
  * 
  */
 @Route(value = "lazy-multi-grid", layout = MainLayout.class)
 public class LazyMultiSelectView extends Div {
 	
 	 public LazyMultiSelectView() {
-        Div messageDiv = new Div();
+		add(new Paragraph(" Multiple selection grid example with lazy loading and editing")); 
+		 
+		Div messageDiv = new Div();
         
         // get data 
         PersonService personService = new PersonService();
@@ -30,8 +33,7 @@ public class LazyMultiSelectView extends Div {
     	        query -> {
     	            int offset = query.getOffset();
     	            int limit = query.getLimit();
-    	            List<Person> persons = personService
-    	                    .fetch(offset, limit);
+    	            List<Person> persons = personService.fetch(offset, limit);
     	            return persons.stream();
     	        },
     	        query -> personService.count()
@@ -47,6 +49,7 @@ public class LazyMultiSelectView extends Div {
         Column<Person> firstNameColumn = grid.addColumn(Person::getFirstName).setHeader("First Name");
         grid.addColumn(Person::getAge).setHeader("Age");
 
+        // set selection mode
         grid.setSelectionMode(Grid.SelectionMode.MULTI);
 
         grid.asMultiSelect().addValueChangeListener(event -> {
@@ -76,7 +79,7 @@ public class LazyMultiSelectView extends Div {
         
         // cancel edit
         grid.getElement().addEventListener("keyup",
-                event -> grid.getEditor().cancel())
+                event -> editor.cancel())
         .setFilter("event.key === 'Escape' || event.key === 'Esc'");
        
         add(grid, messageDiv);

@@ -14,6 +14,7 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.grid.editor.Editor;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
@@ -24,13 +25,15 @@ import com.vaadin.flow.data.provider.SortDirection;
 import com.vaadin.flow.router.Route;
 
 /**
- * Single selection grid example with lazy loading
+ * Single selection grid example with lazy loading, editing, filtering and sorting.
  * 
  */
 @Route(value = "lazy-single-grid", layout = MainLayout.class)
 public class LazySingleSelectView extends Div {
 	
 	 public LazySingleSelectView() {
+		add(new Paragraph("Single selection grid example with lazy loading, editing, filtering and sorting")); 
+		 
         Div messageDiv = new Div();
         
         // get lazy data provider
@@ -98,13 +101,12 @@ public class LazySingleSelectView extends Div {
         // add layout for buttons
         HorizontalLayout horizontalLayout = new HorizontalLayout();
         horizontalLayout.setWidthFull();
+        horizontalLayout.setJustifyContentMode(JustifyContentMode.END);
         // add button to clear all selected filters
         Button clearFiltersButton = new Button("Clear Filters", e -> grid.clearAllFilters());
-        horizontalLayout.setJustifyContentMode(JustifyContentMode.END);
         horizontalLayout.add(clearFiltersButton);
         // add button to clear all sorting
         Button clearSortingButton = new Button("Clear Sorting", e -> grid.sort(null));
-        horizontalLayout.setJustifyContentMode(JustifyContentMode.END);
         horizontalLayout.add(clearSortingButton);
         
         add(grid, messageDiv, horizontalLayout);
