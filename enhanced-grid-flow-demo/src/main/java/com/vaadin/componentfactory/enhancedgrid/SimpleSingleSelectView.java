@@ -9,6 +9,8 @@ import com.vaadin.componentfactory.enhancedgrid.service.PersonService;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
+import com.vaadin.flow.component.grid.GridSortOrder;
+import com.vaadin.flow.component.grid.GridSortOrderBuilder;
 import com.vaadin.flow.component.grid.editor.Editor;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -34,10 +36,18 @@ public class SimpleSingleSelectView extends Div {
         grid.setItems(personList);
      
         // add columns
+        // first name column with filtering button on header
         Column<Person> firstNameColumn = grid.addColumn(Person::getFirstName).setHeader("First Name", new TextFilterField());
+        // last name column with filtering button and pre-selected filter by last name = "Allen"
         grid.addColumn(Person::getLastName).setHeader("Last Name", new TextFilterField(new TextFieldFilterDto("Allen")));
-        grid.addColumn(Person::getAge).setHeader("Age");
-        firstNameColumn.setSortable(true);
+        // age column 
+        Column<Person> ageColumn = grid.addColumn(Person::getAge).setHeader("Age");
+        ageColumn.setSortable(true);
+        
+        // add pre-selected descendent order for first name column
+        List<GridSortOrder<Person>> sortByFirstName = new GridSortOrderBuilder<Person>()
+    	      .thenDesc(firstNameColumn).build();
+    	grid.sort(sortByFirstName);
 
         // set selection mode
         grid.setSelectionMode(Grid.SelectionMode.SINGLE);
@@ -96,10 +106,15 @@ public class SimpleSingleSelectView extends Div {
         // add layout for buttons
         HorizontalLayout horizontalLayout = new HorizontalLayout();
         horizontalLayout.setWidthFull();
+        // add button to clear all selected filters
         Button clearFiltersButton = new Button("Clear Filters", e -> grid.clearAllFilters());
         horizontalLayout.setJustifyContentMode(JustifyContentMode.END);
         horizontalLayout.add(clearFiltersButton);
-        
+        // add button to clear all sorting
+        Button clearSortingButton = new Button("Clear Sorting", e -> grid.sort(null));
+        horizontalLayout.setJustifyContentMode(JustifyContentMode.END);
+        horizontalLayout.add(clearSortingButton);
+ 
         add(grid, messageDiv, horizontalLayout);
     }
 
