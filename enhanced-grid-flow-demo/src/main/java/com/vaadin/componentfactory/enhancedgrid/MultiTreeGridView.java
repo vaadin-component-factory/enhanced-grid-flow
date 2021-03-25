@@ -7,18 +7,21 @@ import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.grid.Grid.SelectionMode;
 import com.vaadin.flow.component.grid.editor.Editor;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.Route;
 
 /**
- * Basic multiple selection treegrid example
+ * Basic multiple selection treegrid example with editing.
  * 
  */
 @Route(value = "multi-tree", layout = MainLayout.class)
 public class MultiTreeGridView extends Div {
 
 	 public MultiTreeGridView() {
+		add(new Paragraph("Basic multiple selection treegrid example with editing")); 
+		 
 		Div messageDiv = new Div(); 
 		 
 		DepartmentData departmentData = new DepartmentData();
@@ -67,7 +70,7 @@ public class MultiTreeGridView extends Div {
         
         // cancel edit
         grid.getElement().addEventListener("keyup",
-                event -> grid.getEditor().cancel())
+                event -> editor.cancel())
         .setFilter("event.key === 'Escape' || event.key === 'Esc'");
 		
 		add(grid, messageDiv);

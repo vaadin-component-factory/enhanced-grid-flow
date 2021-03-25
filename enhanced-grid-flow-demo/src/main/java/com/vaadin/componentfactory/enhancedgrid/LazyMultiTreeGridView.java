@@ -9,6 +9,7 @@ import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.grid.Grid.SelectionMode;
 import com.vaadin.flow.component.grid.editor.Editor;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.provider.hierarchy.AbstractBackEndHierarchicalDataProvider;
@@ -17,13 +18,15 @@ import com.vaadin.flow.data.provider.hierarchy.HierarchicalQuery;
 import com.vaadin.flow.router.Route;
 
 /**
- * Multiple selection treegrid example with lazy loading
+ * Multiple selection treegrid example with lazy loading and editing.
  * 
  */
 @Route(value = "lazy-multi-tree", layout = MainLayout.class)
 public class LazyMultiTreeGridView extends Div {
 
 	 public LazyMultiTreeGridView() {
+		add(new Paragraph("Multiple selection treegrid example with lazy loading and editing")); 
+		 
 		Div messageDiv = new Div(); 
 		 
 		EnhancedTreeGrid<Department> grid = new EnhancedTreeGrid<>();
@@ -91,7 +94,7 @@ public class LazyMultiTreeGridView extends Div {
         
         // cancel edit
         grid.getElement().addEventListener("keyup",
-                event -> grid.getEditor().cancel())
+                event -> editor.cancel())
         .setFilter("event.key === 'Escape' || event.key === 'Esc'");
 		
 		add(grid, messageDiv);
