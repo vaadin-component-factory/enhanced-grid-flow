@@ -32,6 +32,10 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 
 public class FilterField extends Popup {
 	
+	private static final String APPLY_BTN_KEY = "filter-field.apply.btn";
+	
+	private static final String RESET_BTN_KEY = "filter-field.reset.btn";
+	
 	private Button applyButton;
 	
 	private Button resetButton;
@@ -51,9 +55,9 @@ public class FilterField extends Popup {
 	}
 		
 	private HorizontalLayout createButtonsLayout() {
-		applyButton = new Button("Apply", e -> applyFilter());
+		applyButton = new Button(getTranslation(APPLY_BTN_KEY), e -> applyFilter());
 		applyButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
-		resetButton = new Button("Reset", e -> resetFilter());    	
+		resetButton = new Button(getTranslation(RESET_BTN_KEY), e -> resetFilter());    	
 		resetButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
     	HorizontalLayout buttonsLayout = new HorizontalLayout();
     	buttonsLayout.setWidthFull();
