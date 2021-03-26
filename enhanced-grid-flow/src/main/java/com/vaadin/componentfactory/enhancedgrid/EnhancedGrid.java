@@ -33,21 +33,20 @@ import com.vaadin.flow.component.grid.ApplyFilterListener;
 import com.vaadin.flow.component.grid.CancelEditConfirmDialog;
 import com.vaadin.flow.component.grid.CustomAbstractGridMultiSelectionModel;
 import com.vaadin.flow.component.grid.CustomAbstractGridSingleSelectionModel;
+import com.vaadin.flow.component.grid.Filter;
 import com.vaadin.flow.component.grid.FilterField;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridArrayUpdater;
 import com.vaadin.flow.component.grid.GridArrayUpdater.UpdateQueueData;
 import com.vaadin.flow.component.grid.GridSelectionModel;
-import com.vaadin.flow.component.grid.Filter;
 import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
 import com.vaadin.flow.data.provider.DataGenerator;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.provider.ListDataProvider;
-import com.vaadin.flow.data.provider.hierarchy.AbstractBackEndHierarchicalDataProvider;
-import com.vaadin.flow.data.provider.hierarchy.TreeDataProvider;
 import com.vaadin.flow.data.renderer.Renderer;
 import com.vaadin.flow.data.selection.SelectionEvent;
 import com.vaadin.flow.function.SerializableBiFunction;
+import com.vaadin.flow.function.SerializableFunction;
 import com.vaadin.flow.function.SerializablePredicate;
 import com.vaadin.flow.function.SerializableRunnable;
 import com.vaadin.flow.function.ValueProvider;
@@ -173,7 +172,7 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver, App
         }
         generateSelectionGenerator = this::generateSelectionAccess;
         addDataGenerator(generateSelectionGenerator);
-       
+               
         setClassNameGenerator(item -> {
     		if(!selectionPredicate.test(item)) {
     			return "selection-disabled";
@@ -181,7 +180,7 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver, App
 			return null; 
     	});
     }
-
+        
     /**
      * Add a selectionDisabled value on the client side
      *
@@ -267,7 +266,7 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver, App
     	}
     	
 		if(onEditItem != null && !item.equals(onEditItem) && allowCancelEditDialogDisplay()) {
-			cancelEditItem(item, null);
+			cancelEditItem(item, null, null);
 		} else {
 			this.getEditor().editItem(item);
 		}        
@@ -278,17 +277,26 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver, App
      * 
      */
     public void cancelEdit() {
-    	cancelEditItem(null, null);
+    	cancelEditItem(null, null, null);
     }
     
-    private void cancelEditItem(T newEditItem, ContinueNavigationAction action) {
+    /**
+     * Cancel the current item edition with an specific callback for cancel action. 
+     * 
+     * @param onCancelCallback
+     */
+    protected void cancelEditWithCancelCallback(SerializableRunnable onCancelCallback) {
+    	cancelEditItem(null, null, onCancelCallback);
+    }
+    
+    private void cancelEditItem(T newEditItem, ContinueNavigationAction action, SerializableRunnable onCancelCallback) {
     	String text = getTranslation(CANCEL_EDIT_MSG_KEY);
     	String confirmText = getTranslation(CANCEL_EDIT_CONFIRM_BTN_KEY); 
     	String cancelText = getTranslation(CANCEL_EDIT_CANCEL_BTN_KEY);
        	SerializableRunnable onConfirmCallback = action != null ? () -> this.onConfirmEditItem(newEditItem, action) : () -> this.onConfirmEditItem(newEditItem);
-       	new CancelEditConfirmDialog(text, confirmText, cancelText, onConfirmCallback).open();
-     }
-   
+       	new CancelEditConfirmDialog(text, confirmText, cancelText, onConfirmCallback, onCancelCallback).open();
+    }
+
     private void onConfirmEditItem(T newEditItem) {
     	this.getEditor().cancel();
 		if(newEditItem != null) {
@@ -300,7 +308,7 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver, App
     	this.onConfirmEditItem(null);
     	action.proceed(); 
     }
-   
+       
 	/**
 	 * Set showCancelEditDialog value to know if {@link CancelEditConfirmDialog} should be displayed.
 	 * 
@@ -316,7 +324,7 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver, App
 	 * 
 	 * @return
 	 */
-	private boolean allowCancelEditDialogDisplay() {
+	protected boolean allowCancelEditDialogDisplay() {
 		return showCancelEditDialog && this.getEditor().isBuffered();
 	}	
     
@@ -325,7 +333,7 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver, App
 		T onEditItem = this.getEditor().getItem();
 		if(onEditItem != null && allowCancelEditDialogDisplay()) {
 			ContinueNavigationAction action = event.postpone();
-			cancelEditItem(null, action);
+			cancelEditItem(null, action, null);
 		}		
 	}	
 	

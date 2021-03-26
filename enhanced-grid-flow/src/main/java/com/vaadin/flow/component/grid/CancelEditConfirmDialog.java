@@ -36,7 +36,8 @@ public class CancelEditConfirmDialog extends Dialog {
 	
 	private Button cancelButton;
 	
-	public CancelEditConfirmDialog(String text, String confirmText, String cancelText, SerializableRunnable onConfirmCallback) {
+	public CancelEditConfirmDialog(String text, String confirmText, String cancelText, SerializableRunnable onConfirmCallback, 
+			SerializableRunnable onCancelCallback) {
 	
 		setCloseOnEsc(true);
     	setCloseOnOutsideClick(false);
@@ -48,7 +49,10 @@ public class CancelEditConfirmDialog extends Dialog {
     		this.close();    		
     	});
     	
-    	cancelButton = new Button(cancelText, e -> this.close());
+    	cancelButton = new Button(cancelText, e -> {
+    		onCancelCallback.run();
+    		this.close();
+    	});
     	
     	HorizontalLayout buttonsLayout = new HorizontalLayout();
     	buttonsLayout.setWidthFull();

@@ -96,7 +96,17 @@ public class EnhancedColumn<T> extends Grid.Column<T> {
         filterField.setFor(filterButton.getId().get());
         filterField.addApplyFilterListener(grid);
         filterField.addFilterComponent(filter.getElement().getComponent().get());
-                      
+        
+        filterField.addPopupOpenChangedEventListener(e -> {
+           	if(grid.getEditor().getItem() != null) {
+           		if(grid.allowCancelEditDialogDisplay()) {
+           			grid.cancelEditWithCancelCallback(() -> filterField.hide());
+           		} else {
+           			grid.getEditor().cancel();
+           		}
+           	}  	
+        });
+         
         // this is needed to avoid issues when adding popup
         headerComponent.getElement().appendChild(filterButton.getElement());
         headerComponent.getElement().executeJs("return").then(ignore -> {
