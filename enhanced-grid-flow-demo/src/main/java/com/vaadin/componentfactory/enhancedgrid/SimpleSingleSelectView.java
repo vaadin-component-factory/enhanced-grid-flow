@@ -43,7 +43,7 @@ public class SimpleSingleSelectView extends Div {
      
         // add columns
         // first name column with filtering button on header
-        EnhancedColumn<Person> firstNameColumn = grid.addColumn(Person::getFirstName, PersonSort.FIRST_NAME).setHeader("First Name", new TextFilterField());
+        EnhancedColumn<Person> firstNameColumn = grid.addColumn(Person::getFirstName).setHeader("First Name", new TextFilterField());
         // last name column with filtering button and pre-selected filter by last name = "Allen"
         grid.addColumn(Person::getLastName).setHeader("Last Name", new TextFilterField(new TextFieldFilterDto("Allen")));
         // age column with renderer
