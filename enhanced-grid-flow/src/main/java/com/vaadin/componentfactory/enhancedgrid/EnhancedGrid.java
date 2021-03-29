@@ -26,6 +26,7 @@ import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.ComponentUtil;
 import com.vaadin.flow.component.dependency.CssImport;
@@ -377,6 +378,43 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver, App
         BiFunction<Renderer<T>, String, Column<T>> defaultFactory = getDefaultColumnFactory();
         return (EnhancedColumn<T>) super.addColumn(valueProvider, defaultFactory);
     }
+	
+	/**
+	 * @see Grid#addColumn(ValueProvider, String...)
+	 * 
+	 */
+	@Override
+	public <V extends Comparable<? super V>> EnhancedColumn<T> addColumn(ValueProvider<T, V> valueProvider,
+			String... sortingProperties) {
+		return (EnhancedColumn<T>)super.addColumn(valueProvider, sortingProperties);
+	}
+
+	/**
+	 * @see Grid#addColumn(Renderer)
+	 *  
+	 */
+	@Override
+	public EnhancedColumn<T> addColumn(Renderer<T> renderer) {
+		return (EnhancedColumn<T>) super.addColumn(renderer);
+	}
+	
+	/**
+	 * @see Grid#addColumn(Renderer, String...)
+	 * 
+	 */
+	@Override
+	public EnhancedColumn<T> addColumn(Renderer<T> renderer, String... sortingProperties) {
+		return (EnhancedColumn<T>) super.addColumn(renderer, sortingProperties);
+	}
+		
+	/**
+	 * @see Grid#addComponentColumn(ValueProvider)
+	 * 
+	 */
+	@Override
+	public <V extends Component> EnhancedColumn<T> addComponentColumn(ValueProvider<T, V> componentProvider) {
+		return (EnhancedColumn<T>) super.addComponentColumn(componentProvider);
+	}
 	
 	@Override
 	public void onApplyFilter(Object filter) {
