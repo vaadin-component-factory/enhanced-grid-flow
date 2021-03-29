@@ -66,21 +66,21 @@ public class EnhancedColumn<T> extends Grid.Column<T> {
 		this.grid = grid;
 	}
 	
-	public Column<T> setHeader(String labelText, HasValueAndElement<?, ? extends FilterFieldDto> filter) {	
+	public EnhancedColumn<T> setHeader(String labelText, HasValueAndElement<?, ? extends FilterFieldDto> filter) {	
 		if(filter != null) {
 			Component headerComponent = new Div();
 	        headerComponent.getElement().setText(labelText);
 	        addFilterButtonToHeader(headerComponent, filter);			
-			return super.setHeader(headerComponent); 
+			return (EnhancedColumn<T>) super.setHeader(headerComponent); 
 		}		
-		return super.setHeader(labelText);
+		return (EnhancedColumn<T>) super.setHeader(labelText);
     }
 	
-	public Column<T> setHeader(Component headerComponent, HasValueAndElement<?, ? extends FilterFieldDto> filter) {	
+	public EnhancedColumn<T> setHeader(Component headerComponent, HasValueAndElement<?, ? extends FilterFieldDto> filter) {	
 		if(filter != null) {
 			addFilterButtonToHeader(headerComponent, filter);
 		}				
-		return super.setHeader(headerComponent);		
+		return (EnhancedColumn<T>) super.setHeader(headerComponent);		
 	}
 	
 	private void addFilterButtonToHeader(Component headerComponent, HasValueAndElement<?, ? extends FilterFieldDto> filter) {
