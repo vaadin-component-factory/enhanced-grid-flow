@@ -79,6 +79,27 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver, App
         
     private boolean showCancelEditDialog = true;	    
     	
+    SerializableFunction<T, String> selectionDisabled = new SerializableFunction<T, String>() {
+
+    	@Override
+		public String apply(T item) {
+			if(!selectionPredicate.test(item)) {
+    			return "selection-disabled";
+    		}
+			return "";
+		}
+    	
+	};
+	
+	SerializableFunction<T, String> defaultClassNameGenerator = new SerializableFunction<T, String>() {
+
+    	@Override
+		public String apply(T item) {
+			return "";
+		}
+    	
+	};
+    
     /**
      * @see Grid#Grid()
      */
@@ -172,14 +193,15 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver, App
         }
         generateSelectionGenerator = this::generateSelectionAccess;
         addDataGenerator(generateSelectionGenerator);
-               
-        setClassNameGenerator(item -> {
-    		if(!selectionPredicate.test(item)) {
-    			return "selection-disabled";
-    		}
-			return null; 
-    	});
+                      
+        super.setClassNameGenerator(item -> selectionDisabled.apply(item).concat(" ").concat(defaultClassNameGenerator.apply(item))); 
     }
+      
+	@Override
+	public void setClassNameGenerator(SerializableFunction<T, String> classNameGenerator) {
+		defaultClassNameGenerator = classNameGenerator;	
+		super.setClassNameGenerator(item -> selectionDisabled.apply(item).concat(" ").concat(defaultClassNameGenerator.apply(item)));
+	}
         
     /**
      * Add a selectionDisabled value on the client side
