@@ -2,6 +2,7 @@ package com.vaadin.componentfactory.enhancedgrid.filtering;
 
 import java.util.Objects;
 import java.util.function.Predicate;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -78,8 +79,11 @@ public class TextFieldFilterDto implements FilterFieldDto<String> {
 	public Predicate<String> getFilterPredicate() {
 		Predicate<String> simplePredicate = StringUtils.isNotBlank(filterValue) ? s -> s.contains(filterValue) : s -> true;
 		if(regularExpression) {
-			simplePredicate = s -> s.matches(filterValue);
-			// TODO 			
+			if(wholeField) {
+				simplePredicate = caseSensitive ? s -> Pattern.compile(filterValue.concat("\b")).matcher(s).find() : s -> Pattern.compile(filterValue.concat("\b"), Pattern.CASE_INSENSITIVE).matcher(s).find();
+			} else {
+				simplePredicate = caseSensitive ? s -> Pattern.compile(filterValue).matcher(s).find() : s -> Pattern.compile(filterValue, Pattern.CASE_INSENSITIVE).matcher(s).find();
+			} 			
 		} else if(wholeField){			
 			simplePredicate = caseSensitive ? s -> s.equals(filterValue) : s -> s.equalsIgnoreCase(filterValue);			
 		} else if(caseSensitive) {
