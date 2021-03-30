@@ -28,6 +28,7 @@ import com.vaadin.flow.component.grid.ColumnPathRenderer;
 import com.vaadin.flow.component.grid.FilterFieldDto;
 import com.vaadin.flow.component.grid.FilterField;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.SortOrderProvider;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.icon.Icon;
@@ -170,5 +171,31 @@ public class EnhancedColumn<T> extends Grid.Column<T> {
 	public void clearFilter(){
 		filterField.resetFilter();
 	}
+
+	/**
+	 * @see Column#setSortProperty(String...)
+	 * 
+	 */
+	@Override
+	public EnhancedColumn<T> setSortProperty(String... properties) {
+		return (EnhancedColumn<T>) super.setSortProperty(properties);
+	}
 	
+	/**
+	 * @see Column#setSortOrderProvider(SortOrderProvider)
+	 * 
+	 */
+	@Override
+	public EnhancedColumn<T> setSortOrderProvider(SortOrderProvider provider) {
+		return (EnhancedColumn<T>) super.setSortOrderProvider(provider);
+	}
+	
+	/**
+	 * @see Column#setSortable(boolean)
+	 * 
+	 */
+	@Override
+	public EnhancedColumn<T> setSortable(boolean sortable) {
+		return (EnhancedColumn<T>) super.setSortable(sortable);
+	}
 }
