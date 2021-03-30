@@ -30,6 +30,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.vaadin.componentfactory.enhancedgrid.EnhancedColumn;
 import com.vaadin.componentfactory.enhancedgrid.EnhancedGrid;
 import com.vaadin.flow.component.ClientCallable;
 import com.vaadin.flow.component.Component;
@@ -312,8 +313,8 @@ public class EnhancedTreeGrid<T> extends EnhancedGrid<T> implements HasHierarchi
 	*            the value provider
 	* @return the created hierarchy column
 	*/
-	public Column<T> addHierarchyColumn(ValueProvider<T, ?> valueProvider) {
-		Column<T> column = addColumn(TemplateRenderer
+	public EnhancedColumn<T> addHierarchyColumn(ValueProvider<T, ?> valueProvider) {
+		EnhancedColumn<T> column = addColumn(TemplateRenderer
 		        .<T> of("<vaadin-grid-tree-toggle "
 		                + "leaf='[[item.leaf]]' expanded='{{expanded}}' level='[[level]]'>[[item.name]]"
 		                + "</vaadin-grid-tree-toggle>")
@@ -345,7 +346,7 @@ public class EnhancedTreeGrid<T> extends EnhancedGrid<T> implements HasHierarchi
 	* @see #addColumn(Renderer)
 	* @see #removeColumn(Column)
 	*/
-	public <V extends Component> Column<T> addComponentHierarchyColumn(
+	public <V extends Component> EnhancedColumn<T> addComponentHierarchyColumn(
 	    ValueProvider<T, V> componentProvider) {
 		return addColumn(new HierarchyColumnComponentRenderer<V, T>(
 	        componentProvider).withProperty("leaf",
