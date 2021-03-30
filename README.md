@@ -18,13 +18,22 @@ This deploys demo at http://localhost:8080
 
 ## Description 
 
-The grid component provides support to Vaadin Grid and TreeGrid to:
+This component is an extended version of Grid that provides support to the following features:
 
-
+- set a predicate to indicate which rows/items can be selected 
+- set a predicate to indicate which rows/items can be edited
+- check if a item is editable
+- edit an item and cancel the edit
+- set a flag to indicate if a cancel edit confirmation dialog should be display if user navigates away from current editing row
+- set messages through internationalization in the cancel edit confirmation dialog
+- each column can define a filter field/dialog
+- if a filter field is define, an icon will be displayed in the column header, switching color if a filter is applied
+- pre-selection of filters to apply for each column
+- pre-selection of sorting direction for each column
 
 ## How to use it
 
-Create a new component EnhancedGrid/EnhancedTreeGrid and use it like a Grid.
+Create a new component EnhancedGrid/EnhancedTreeGrid and use it like a Grid/TreeGrid.
 
 
 ## Examples
