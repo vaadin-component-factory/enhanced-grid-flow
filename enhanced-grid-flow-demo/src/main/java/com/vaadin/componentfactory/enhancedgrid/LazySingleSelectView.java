@@ -12,7 +12,6 @@ import com.vaadin.componentfactory.enhancedgrid.service.PersonService;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Filter;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.grid.GridSortOrder;
 import com.vaadin.flow.component.grid.editor.Editor;
 import com.vaadin.flow.component.html.Div;
@@ -61,7 +60,7 @@ public class LazySingleSelectView extends Div {
         
         // add columns
         // first name column with filtering button on header
-        Column<Person> firstNameColumn = grid.addColumn(Person::getFirstName).setHeader("First Name", new TextFilterField()).setSortProperty(PersonSort.FIRST_NAME);
+        EnhancedColumn<Person> firstNameColumn = grid.addColumn(Person::getFirstName).setHeader("First Name", new TextFilterField()).setSortProperty(PersonSort.FIRST_NAME);
         // last name column with filtering button and pre-selected filter by last name = "Allen"
         grid.addColumn(Person::getLastName).setHeader("Last Name", new TextFilterField(new TextFieldFilterDto("Allen"))).setSortProperty(PersonSort.LAST_NAME);
         // age column 

@@ -5,7 +5,6 @@ import java.util.stream.Stream;
 import com.vaadin.componentfactory.enhancedgrid.bean.Department;
 import com.vaadin.componentfactory.enhancedgrid.service.DepartmentService;
 import com.vaadin.componentfactory.enhancedtreegrid.EnhancedTreeGrid;
-import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.grid.Grid.SelectionMode;
 import com.vaadin.flow.component.grid.editor.Editor;
 import com.vaadin.flow.component.html.Div;
@@ -32,9 +31,9 @@ public class LazyMultiTreeGridView extends Div {
 		EnhancedTreeGrid<Department> grid = new EnhancedTreeGrid<>();
 		
 		// add columns
-		Column<Department> nameColumn = grid.addHierarchyColumn(Department::getName)
+		EnhancedColumn<Department> nameColumn = grid.addHierarchyColumn(Department::getName)
 		        .setHeader("Department Name");
-		Column<Department> managerColumn = grid.addColumn(Department::getManager).setHeader("Manager");				
+		EnhancedColumn<Department> managerColumn = grid.addColumn(Department::getManager).setHeader("Manager");				
 		managerColumn.setSortable(true);	
 		
 		// get data

@@ -12,14 +12,13 @@ import com.vaadin.componentfactory.enhancedgrid.service.DepartmentService;
 import com.vaadin.componentfactory.enhancedtreegrid.EnhancedTreeGrid;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Filter;
-import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.grid.Grid.SelectionMode;
 import com.vaadin.flow.component.grid.GridSortOrder;
 import com.vaadin.flow.component.grid.editor.Editor;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Paragraph;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.provider.SortDirection;
@@ -43,8 +42,8 @@ public class LazySingleTreeGridView extends Div {
 		EnhancedTreeGrid<Department> grid = new EnhancedTreeGrid<>();
 		
 		// add columns
-		Column<Department> nameColumn = grid.addHierarchyColumn(Department::getName).setHeader("Department Name").setSortProperty(DepartmentSort.NAME);
-		Column<Department> managerColumn = grid.addColumn(Department::getManager).setHeader("Manager", new TextFilterField()).setSortProperty(DepartmentSort.MANAGER);				
+		EnhancedColumn<Department> nameColumn = grid.addHierarchyColumn(Department::getName).setHeader("Department Name").setSortProperty(DepartmentSort.NAME);
+		EnhancedColumn<Department> managerColumn = grid.addColumn(Department::getManager).setHeader("Manager", new TextFilterField()).setSortProperty(DepartmentSort.MANAGER);				
 						
 		// add ascending sorting for manager column
 		grid.sort(Arrays.asList(new GridSortOrder<Department>(managerColumn, SortDirection.ASCENDING)));

@@ -1,5 +1,7 @@
 package com.vaadin.componentfactory.enhancedgrid;
 
+import java.util.List;
+
 import com.vaadin.componentfactory.enhancedgrid.bean.Person;
 import com.vaadin.componentfactory.enhancedgrid.filtering.TextFieldFilterDto;
 import com.vaadin.componentfactory.enhancedgrid.filtering.TextFilterField;
@@ -8,17 +10,14 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridSortOrder;
 import com.vaadin.flow.component.grid.GridSortOrderBuilder;
-import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.grid.editor.Editor;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Paragraph;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.Route;
-
-import java.util.List;
 
 /**
  * Basic multiple selection grid example with setItems, editing, filtering and sorting.
@@ -41,14 +40,14 @@ public class SimpleMultiSelectView extends Div {
 
         // add columns
         // first name column with filtering button on header
-        Column<Person> firstNameColumn = grid.addColumn(Person::getFirstName).setHeader("First Name", new TextFilterField());
+        EnhancedColumn<Person> firstNameColumn = grid.addColumn(Person::getFirstName).setHeader("First Name", new TextFilterField());
         // last name column with filtering button and pre-selected filter by last name = "Allen"
         grid.addColumn(Person::getLastName).setHeader("Last Name", new TextFilterField(new TextFieldFilterDto("Allen")));
         // age column 
-        Column<Person> ageColumn = grid.addColumn(Person::getAge).setHeader("Age");
+        EnhancedColumn<Person> ageColumn = grid.addColumn(Person::getAge).setHeader("Age");
         ageColumn.setSortable(true);
 
-        // add pre-selected descendent order for first name column
+        // add pre-selected ascendent order for first name column
         List<GridSortOrder<Person>> sortByFirstName = new GridSortOrderBuilder<Person>()
     	      .thenAsc(firstNameColumn).build();
     	grid.sort(sortByFirstName);        
