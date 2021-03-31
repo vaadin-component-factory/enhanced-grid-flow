@@ -300,7 +300,13 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver, App
      * 
      */
     public void cancelEdit() {
-    	cancelEditItem(null, null, null);
+    	if(this.getEditor().getItem() != null) {
+	    	if(allowCancelEditDialogDisplay()) {
+				cancelEditItem(null, null, null);
+			} else {
+				this.getEditor().cancel();
+			}
+    	}
     }
     
     /**
@@ -309,7 +315,13 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver, App
      * @param onCancelCallback
      */
     protected void cancelEditWithCancelCallback(SerializableRunnable onCancelCallback) {
-    	cancelEditItem(null, null, onCancelCallback);
+    	if(this.getEditor().getItem() != null) {
+	    	if(allowCancelEditDialogDisplay()) {
+	    	  	cancelEditItem(null, null, onCancelCallback);
+			} else {
+				this.getEditor().cancel();
+			}
+    	}      
     }
     
     private void cancelEditItem(T newEditItem, ContinueNavigationAction action, SerializableRunnable onCancelCallback) {
