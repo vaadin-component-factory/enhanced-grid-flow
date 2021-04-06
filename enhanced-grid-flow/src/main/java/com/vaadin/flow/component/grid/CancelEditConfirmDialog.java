@@ -50,7 +50,9 @@ public class CancelEditConfirmDialog extends Dialog {
     	});
     	
     	cancelButton = new Button(cancelText, e -> {
-    		onCancelCallback.run();
+    		if(onCancelCallback != null) {
+    			onCancelCallback.run();
+    		}
     		this.close();
     	});
     	
