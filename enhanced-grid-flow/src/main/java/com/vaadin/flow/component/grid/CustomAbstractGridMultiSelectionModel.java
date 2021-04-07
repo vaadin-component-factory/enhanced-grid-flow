@@ -400,7 +400,7 @@ public abstract class CustomAbstractGridMultiSelectionModel<T>
 
     private void doUpdateSelection(Set<T> addedItems, Set<T> removedItems,
             boolean userOriginated) {
-        Set<T> filteredAddedItems = addedItems.stream().filter(item -> ((EnhancedGrid) getGrid()).getSelectionFilter().test(item)).collect(Collectors.toSet());
+        Set<T> filteredAddedItems = addedItems.stream().filter(item -> ((EnhancedGrid) getGrid()).getSelectionPredicate().test(item)).collect(Collectors.toSet());
         Map<Object, T> addedItemsMap = mapItemsById(filteredAddedItems);
         Map<Object, T> removedItemsMap = mapItemsById(removedItems);
         addedItemsMap.keySet().stream().filter(removedItemsMap::containsKey)

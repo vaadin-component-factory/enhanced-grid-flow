@@ -1,9 +1,11 @@
-package com.vaadin.componentfactory.enhancedgrid.bean;
+package com.vaadin.componentfactory.enhancedgrid.data;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+
+import com.vaadin.componentfactory.enhancedgrid.bean.Department;
 
 public class DepartmentData {
     private static final List<Department> DEPARTMENT_LIST = createDepartmentList();

@@ -20,26 +20,87 @@ package com.vaadin.componentfactory.enhancedgrid;
  * #L%
  */
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.function.BiFunction;
+import java.util.function.Predicate;
+
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.ComponentUtil;
+import com.vaadin.flow.component.dependency.CssImport;
+import com.vaadin.flow.component.grid.ApplyFilterListener;
+import com.vaadin.flow.component.grid.CancelEditConfirmDialog;
 import com.vaadin.flow.component.grid.CustomAbstractGridMultiSelectionModel;
 import com.vaadin.flow.component.grid.CustomAbstractGridSingleSelectionModel;
+import com.vaadin.flow.component.grid.Filter;
+import com.vaadin.flow.component.grid.FilterField;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.GridArrayUpdater;
+import com.vaadin.flow.component.grid.GridArrayUpdater.UpdateQueueData;
 import com.vaadin.flow.component.grid.GridSelectionModel;
+import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
 import com.vaadin.flow.data.provider.DataGenerator;
+import com.vaadin.flow.data.provider.DataProvider;
+import com.vaadin.flow.data.provider.ListDataProvider;
+import com.vaadin.flow.data.renderer.Renderer;
 import com.vaadin.flow.data.selection.SelectionEvent;
+import com.vaadin.flow.function.SerializableBiFunction;
+import com.vaadin.flow.function.SerializableFunction;
 import com.vaadin.flow.function.SerializablePredicate;
+import com.vaadin.flow.function.SerializableRunnable;
+import com.vaadin.flow.function.ValueProvider;
+import com.vaadin.flow.router.BeforeLeaveEvent;
+import com.vaadin.flow.router.BeforeLeaveEvent.ContinueNavigationAction;
+import com.vaadin.flow.router.BeforeLeaveObserver;
+
 import elemental.json.JsonObject;
 
-import java.util.Objects;
-
 /**
- * Add a selectionFilter to forbid the grid selection for specific rows
+ * Add a selectionPredicate to forbid the grid selection for specific rows
+ * Add a editablePredicate to forbid the edition for specific rows
  *
  * @param <T>
  */
-public class EnhancedGrid<T> extends Grid<T> {
+@CssImport(value = "./styles/enhanced-grid-selection-disabled.css", themeFor = "vaadin-grid")
+public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver, ApplyFilterListener {
 
+	private static final String CANCEL_EDIT_MSG_KEY = "cancel-edit-dialog.text";
+	    
+    private static final String CANCEL_EDIT_CONFIRM_BTN_KEY = "cancel-edit-dialog.confirm-btn";
+    
+    private static final String CANCEL_EDIT_CANCEL_BTN_KEY = "cancel-edit-dialog.cancel-btn";
+    
+    private SerializablePredicate<T> selectionPredicate = item -> true;
+    
+    private DataGenerator<T> generateSelectionGenerator;
+    
+    private SerializablePredicate<T> editablePredicate = item -> true;
+        
+    private boolean showCancelEditDialog = true;	    
+    	
+    SerializableFunction<T, String> selectionDisabled = new SerializableFunction<T, String>() {
+
+    	@Override
+		public String apply(T item) {
+			if(!selectionPredicate.test(item)) {
+    			return "selection-disabled";
+    		}
+			return "";
+		}
+    	
+	};
+	
+	SerializableFunction<T, String> defaultClassNameGenerator = new SerializableFunction<T, String>() {
+
+    	@Override
+		public String apply(T item) {
+			return "";
+		}
+    	
+	};
+    
     /**
      * @see Grid#Grid()
      */
@@ -77,28 +138,72 @@ public class EnhancedGrid<T> extends Grid<T> {
     public EnhancedGrid(Class<T> beanType) {
         super(beanType);
     }
-
-    private SerializablePredicate<T> selectionFilter = item -> true;
-    private DataGenerator<T> generateSelectionGenerator;
-
-    public SerializablePredicate<T> getSelectionFilter() {
-        return selectionFilter;
+    
+    /**
+     * 
+     * @see Grid#Grid(Class, SerializableBiFunction, DataCommunicatorBuilder)
+     * 
+     * @param <U>
+     * @param <B>
+     * @param beanType
+     * @param updateQueueBuilder
+     * @param dataCommunicatorBuilder
+     */
+    protected <U extends GridArrayUpdater, B extends DataCommunicatorBuilder<T, U>> EnhancedGrid(
+            Class<T> beanType,
+            SerializableBiFunction<UpdateQueueData, Integer, UpdateQueue> updateQueueBuilder,
+            B dataCommunicatorBuilder){
+    	super(beanType, updateQueueBuilder, dataCommunicatorBuilder);
+    }
+    
+    /**
+     * 
+     * @see Grid#Grid(int, SerializableBiFunction, DataCommunicatorBuilder)
+     * 
+     * @param <U>
+     * @param <B>
+     * @param pageSize
+     * @param updateQueueBuilder
+     * @param dataCommunicatorBuilder
+     */
+    protected <U extends GridArrayUpdater, B extends DataCommunicatorBuilder<T, U>> EnhancedGrid(
+            int pageSize,
+            SerializableBiFunction<UpdateQueueData, Integer, UpdateQueue> updateQueueBuilder,
+            B dataCommunicatorBuilder) {
+    	super(pageSize, updateQueueBuilder, dataCommunicatorBuilder);
+    }
+    
+    /**
+     * Define if an item can be selected.
+     * 
+     * @return
+     */
+    public SerializablePredicate<T> getSelectionPredicate() {
+        return selectionPredicate;
     }
 
     /**
-     * Disable selection/deselection of the item that doesn't match the selectionFilter
+     * Disable selection/deselection of the item that doesn't match the selectionPredicate
      *
-     * @param selectionFilter selectionFilter
+     * @param selectionPredicate selectionPredicate
      */
-    public void setSelectionFilter(SerializablePredicate<T> selectionFilter) {
-        this.selectionFilter = selectionFilter;
+    public void setSelectionPredicate(SerializablePredicate<T> selectionPredicate) {
+        this.selectionPredicate = selectionPredicate;
         if (generateSelectionGenerator != null) {
             removeDataGenerator(generateSelectionGenerator);
         }
         generateSelectionGenerator = this::generateSelectionAccess;
         addDataGenerator(generateSelectionGenerator);
+                      
+        super.setClassNameGenerator(item -> selectionDisabled.apply(item).concat(" ").concat(defaultClassNameGenerator.apply(item))); 
     }
-
+      
+	@Override
+	public void setClassNameGenerator(SerializableFunction<T, String> classNameGenerator) {
+		defaultClassNameGenerator = classNameGenerator;	
+		super.setClassNameGenerator(item -> selectionDisabled.apply(item).concat(" ").concat(defaultClassNameGenerator.apply(item)));
+	}
+        
     /**
      * Add a selectionDisabled value on the client side
      *
@@ -106,11 +211,11 @@ public class EnhancedGrid<T> extends Grid<T> {
      * @param jsonObject jsonObject
      */
     private void generateSelectionAccess(T item, JsonObject jsonObject) {
-        if (!selectionFilter.test(item)) {
+        if (!selectionPredicate.test(item)) {
             jsonObject.put("selectionDisabled", true);
         }
     }
-
+    
     @Override
     public GridSelectionModel<T> setSelectionMode(SelectionMode selectionMode) {
         if (selectionMode == SelectionMode.MULTI) {
@@ -147,4 +252,242 @@ public class EnhancedGrid<T> extends Grid<T> {
             return super.setSelectionMode(selectionMode);
         }
     }
+    
+   
+    /**
+     * Define if an item can be edited.
+     * 
+     * @param editablePredicate
+     */
+    public void setEditablePredicate(SerializablePredicate<T> editablePredicate) {
+        this.editablePredicate = editablePredicate;
+    }
+    
+    /**
+     * Return whether an item is editable or not.
+     * 
+     * @param item
+     * @return
+     */
+    public boolean isEditable(T item) {
+    	return this.editablePredicate.test(item);
+    }
+        
+    /**
+     * Edit the selected item.
+     * 
+     * @param item
+     */
+    public void editItem(T item) {
+        if(!isEditable(item)) {
+    		return;
+    	}
+        
+        T onEditItem = this.getEditor().getItem();    	    	
+    	if(onEditItem != null && item.equals(onEditItem)) {
+    		return;
+    	}
+    	
+		if(onEditItem != null && !item.equals(onEditItem) && allowCancelEditDialogDisplay()) {
+			cancelEditItem(item, null, null);
+		} else {
+			this.getEditor().editItem(item);
+		}        
+    }
+    
+    /**
+     * Cancel the current item edition.
+     * 
+     */
+    public void cancelEdit() {
+    	if(this.getEditor().getItem() != null) {
+	    	if(allowCancelEditDialogDisplay()) {
+				cancelEditItem(null, null, null);
+			} else {
+				this.getEditor().cancel();
+			}
+    	}
+    }
+    
+    /**
+     * Cancel the current item edition with an specific callback for cancel action. 
+     * 
+     * @param onCancelCallback
+     */
+    protected void cancelEditWithCancelCallback(SerializableRunnable onCancelCallback) {
+    	if(this.getEditor().getItem() != null) {
+	    	if(allowCancelEditDialogDisplay()) {
+	    	  	cancelEditItem(null, null, onCancelCallback);
+			} else {
+				this.getEditor().cancel();
+			}
+    	}      
+    }
+    
+    private void cancelEditItem(T newEditItem, ContinueNavigationAction action, SerializableRunnable onCancelCallback) {
+    	String text = getTranslation(CANCEL_EDIT_MSG_KEY);
+    	String confirmText = getTranslation(CANCEL_EDIT_CONFIRM_BTN_KEY); 
+    	String cancelText = getTranslation(CANCEL_EDIT_CANCEL_BTN_KEY);
+       	SerializableRunnable onConfirmCallback = action != null ? () -> this.onConfirmEditItem(newEditItem, action) : () -> this.onConfirmEditItem(newEditItem);
+       	new CancelEditConfirmDialog(text, confirmText, cancelText, onConfirmCallback, onCancelCallback).open();
+    }
+
+    private void onConfirmEditItem(T newEditItem) {
+    	this.getEditor().cancel();
+		if(newEditItem != null) {
+			this.getEditor().editItem(newEditItem);
+		}
+    }
+    
+    private void onConfirmEditItem(T newEditItem, ContinueNavigationAction action) {
+    	this.onConfirmEditItem(null);
+    	action.proceed(); 
+    }
+       
+	/**
+	 * Set showCancelEditDialog value to know if {@link CancelEditConfirmDialog} should be displayed.
+	 * 
+	 * @param showCancelEditDialog
+	 */
+	public void setShowCancelEditDialog(boolean showCancelEditDialog) {
+		this.showCancelEditDialog = showCancelEditDialog;
+	}
+    
+	/**
+	 * {@link CancelEditConfirmDialog} will be displayed if showCancelEditDialog 
+	 * is true and editor is in buffered mode.
+	 * 
+	 * @return
+	 */
+	protected boolean allowCancelEditDialogDisplay() {
+		return showCancelEditDialog && this.getEditor().isBuffered();
+	}	
+    
+	@Override
+	public void beforeLeave(BeforeLeaveEvent event) {
+		T onEditItem = this.getEditor().getItem();
+		if(onEditItem != null && allowCancelEditDialogDisplay()) {
+			ContinueNavigationAction action = event.postpone();
+			cancelEditItem(null, action, null);
+		}		
+	}	
+	
+	/**
+	 * @see Grid#getDefaultColumnFactory()
+	 * 
+	 */
+	@Override
+	protected BiFunction<Renderer<T>, String, Column<T>> getDefaultColumnFactory() {
+		return (renderer, columnId) -> new EnhancedColumn(this, columnId, renderer);
+	}
+	
+	/**
+	 * @see Grid#addColumn(ValueProvider)
+	 * 
+	 */
+	@Override
+	public EnhancedColumn<T> addColumn(ValueProvider<T, ?> valueProvider) {
+        BiFunction<Renderer<T>, String, Column<T>> defaultFactory = getDefaultColumnFactory();
+        return (EnhancedColumn<T>) super.addColumn(valueProvider, defaultFactory);
+    }
+	
+	/**
+	 * @see Grid#addColumn(ValueProvider, String...)
+	 * 
+	 */
+	@Override
+	public <V extends Comparable<? super V>> EnhancedColumn<T> addColumn(ValueProvider<T, V> valueProvider,
+			String... sortingProperties) {
+		return (EnhancedColumn<T>)super.addColumn(valueProvider, sortingProperties);
+	}
+
+	/**
+	 * @see Grid#addColumn(Renderer)
+	 *  
+	 */
+	@Override
+	public EnhancedColumn<T> addColumn(Renderer<T> renderer) {
+		return (EnhancedColumn<T>) super.addColumn(renderer);
+	}
+	
+	/**
+	 * @see Grid#addColumn(Renderer, String...)
+	 * 
+	 */
+	@Override
+	public EnhancedColumn<T> addColumn(Renderer<T> renderer, String... sortingProperties) {
+		return (EnhancedColumn<T>) super.addColumn(renderer, sortingProperties);
+	}
+		
+	/**
+	 * @see Grid#addComponentColumn(ValueProvider)
+	 * 
+	 */
+	@Override
+	public <V extends Component> EnhancedColumn<T> addComponentColumn(ValueProvider<T, V> componentProvider) {
+		return (EnhancedColumn<T>) super.addComponentColumn(componentProvider);
+	}
+	
+	@Override
+	public void onApplyFilter(Object filter) {
+		applyFilter();		
+	}	
+	
+	/**
+	 * Apply the filters selected for each column in {@link FilterField}
+	 * 
+	 */
+	public void applyFilter() {
+		List<Predicate<T>> predicates = new ArrayList<>();
+		for(Column<T> column : getColumns()) {
+			EnhancedColumn<T> enhancedColumn = (EnhancedColumn<T>)column;
+			if(enhancedColumn.getFilter() != null) {
+				ValueProvider<T, ?> columnValueProvider = enhancedColumn.getValueProvider();
+				Predicate<Object> filterPredicate = enhancedColumn.getFilter().getValue().getFilterPredicate();
+				predicates.add(p -> filterPredicate.test(columnValueProvider.apply(p))); 
+				enhancedColumn.updateFilterButtonStyle();
+			}
+		}
+		
+		SerializablePredicate<T> finalPredicate = t -> {
+			for(Predicate<T> predicate : predicates) {
+				if(!predicate.test(t)) {
+					return false;
+				}					
+			}
+			return true;
+		};
+		
+		applyFilterPredicate(finalPredicate);		
+	}	
+	
+	/**
+	 * Apply filter predicate depending on the data provider
+	 * 
+	 * @param finalPredicate
+	 */
+	protected void applyFilterPredicate(SerializablePredicate<T> finalPredicate) {
+		DataProvider<T, ?> dataProvider = getDataProvider();
+		if(dataProvider instanceof ListDataProvider<?>) {				
+			((ListDataProvider<T>)dataProvider).setFilter(finalPredicate);	
+		} else if(dataProvider instanceof ConfigurableFilterDataProvider){
+			((ConfigurableFilterDataProvider<T, Void, Filter>)dataProvider).setFilter(new Filter<T>(finalPredicate));
+		}
+	}
+	
+	/**
+	 * Clear all selected filters and updates the displayed data.
+	 * 
+	 */
+	public void clearAllFilters() {
+		for(Column<T> column : getColumns()) {
+			EnhancedColumn<T> enhancedColumn = (EnhancedColumn<T>)column;
+			if(enhancedColumn.getFilter() != null) {			
+				enhancedColumn.clearFilter();
+			}
+		}
+		applyFilter();		
+	}
+
 }
+

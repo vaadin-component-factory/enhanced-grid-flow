@@ -101,6 +101,11 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <dependency>
+		   <groupId>com.vaadin.componentfactory</groupId>
+		   <artifactId>popup</artifactId>
+		   <version>2.2.1</version>
+		</dependency>
 
     </dependencies>
 

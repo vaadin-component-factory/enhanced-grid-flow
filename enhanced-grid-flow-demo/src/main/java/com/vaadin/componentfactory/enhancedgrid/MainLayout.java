@@ -9,11 +9,20 @@ public class MainLayout extends AppLayout {
 
     public MainLayout() {
         final DrawerToggle drawerToggle = new DrawerToggle();
-        final RouterLink simple = new RouterLink("Multi Selection Grid", SimpleView.class);
-        final RouterLink singleSimple = new RouterLink("SingleSelection Grid", SimpleSingleSelectView.class);
-        final VerticalLayout menuLayout = new VerticalLayout(simple, singleSimple);
+        
+        final RouterLink simpleSingleGrid = new RouterLink("Single Selection Grid", SimpleSingleSelectView.class);
+        final RouterLink simpleMultiGrid = new RouterLink("Multiple Selection Grid", SimpleMultiSelectView.class);
+        final RouterLink lazySingleGrid = new RouterLink("Lazy Single Selection Grid", LazySingleSelectView.class);
+        final RouterLink lazyMultiGrid = new RouterLink("Lazy Multiple Selection Grid", LazyMultiSelectView.class);        
+        final RouterLink singleTree = new RouterLink("Single Selection Tree Grid", SingleTreeGridView.class);
+        final RouterLink multiTree = new RouterLink("Multiple Selection Tree Grid", MultiTreeGridView.class);
+        final RouterLink lazySingleTree = new RouterLink("Lazy Single Selection Tree Grid", LazySingleTreeGridView.class);        
+        final RouterLink lazyMultiTree = new RouterLink("Lazy Multiple Selection Tree Grid", LazyMultiTreeGridView.class);   
+                
+        final VerticalLayout menuLayout = new VerticalLayout(simpleSingleGrid, simpleMultiGrid, lazySingleGrid, lazyMultiGrid, 
+        		singleTree, multiTree, lazySingleTree, lazyMultiTree);
         addToDrawer(menuLayout);
         addToNavbar(drawerToggle);
     }
-
+   
 }
