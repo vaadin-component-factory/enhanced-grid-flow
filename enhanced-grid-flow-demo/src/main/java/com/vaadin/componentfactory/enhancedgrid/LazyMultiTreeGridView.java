@@ -54,7 +54,7 @@ public class LazyMultiTreeGridView extends Div {
             @Override
             protected Stream<Department> fetchChildrenFromBackEnd(
                     HierarchicalQuery<Department, Void> query) {
-                return departmentService.fetchChildren(query.getParent()).stream();
+                return departmentService.fetchChildren(query.getParent(), query.getLimit(), query.getOffset()).stream();
             }
         };
 
