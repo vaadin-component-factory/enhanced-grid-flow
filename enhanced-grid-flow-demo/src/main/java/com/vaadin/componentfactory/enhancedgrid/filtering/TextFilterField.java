@@ -3,7 +3,9 @@ package com.vaadin.componentfactory.enhancedgrid.filtering;
 import org.apache.commons.lang3.StringUtils;
 
 import com.vaadin.flow.component.AbstractCompositeField;
+import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.checkbox.Checkbox;
+import com.vaadin.flow.component.grid.FilterField;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
@@ -59,6 +61,7 @@ public class TextFilterField extends AbstractCompositeField<Div, TextFilterField
 		optionsLayout.add(invertResult);
 		
 		filter = new TextField();
+		filter.addKeyDownListener(Key.ENTER, e -> FilterField.findComponent(this).ifPresent(FilterField::applyFilter));
 		binder.bind(filter, TextFieldFilterDto::getFilterValue, TextFieldFilterDto::setFilterValue);
 		
 		binder.setBean(getValue());

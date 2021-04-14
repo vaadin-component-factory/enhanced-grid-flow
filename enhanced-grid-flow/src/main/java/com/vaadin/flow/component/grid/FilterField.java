@@ -1,5 +1,7 @@
 package com.vaadin.flow.component.grid;
 
+import java.util.Optional;
+
 /*-
  * #%L
  * Enhanced Grid
@@ -96,5 +98,17 @@ public class FilterField extends Popup {
 	public void addApplyFilterListener(ApplyFilterListener applyFilterListener) {
         this.applyFilterListener = applyFilterListener;
     }
-		
+
+	/**
+	 * Returns the FilterField that contains the component, if any.
+	 * 
+	 * @param component
+	 * @return
+	 */
+	public static Optional<FilterField> findComponent(Component component) {
+		while(component != null && !(component instanceof FilterField)) {
+			component = component.getParent().orElse(null);
+		}
+		return Optional.ofNullable((FilterField)component);		
+	}
 }
