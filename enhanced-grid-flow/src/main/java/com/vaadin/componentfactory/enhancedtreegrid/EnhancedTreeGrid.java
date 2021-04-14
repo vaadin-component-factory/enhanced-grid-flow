@@ -36,6 +36,7 @@ import com.vaadin.flow.component.ClientCallable;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.ComponentUtil;
+import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.grid.Filter;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridArrayUpdater;
@@ -43,6 +44,7 @@ import com.vaadin.flow.component.grid.GridArrayUpdater.UpdateQueueData;
 import com.vaadin.flow.component.treegrid.CollapseEvent;
 import com.vaadin.flow.component.treegrid.ExpandEvent;
 import com.vaadin.flow.component.treegrid.HierarchyColumnComponentRenderer;
+import com.vaadin.flow.component.treegrid.TreeGrid;
 import com.vaadin.flow.component.treegrid.TreeGridArrayUpdater;
 import com.vaadin.flow.data.binder.PropertyDefinition;
 import com.vaadin.flow.data.provider.CompositeDataGenerator;
@@ -74,6 +76,7 @@ import elemental.json.JsonObject;
 import elemental.json.JsonValue;
 
 @SuppressWarnings("serial")
+@Uses(TreeGrid.class)
 public class EnhancedTreeGrid<T> extends EnhancedGrid<T> implements HasHierarchicalDataProvider<T> {
 
 	private static final class TreeGridUpdateQueue extends UpdateQueue
