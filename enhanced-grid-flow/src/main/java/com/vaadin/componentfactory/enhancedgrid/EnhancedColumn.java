@@ -25,11 +25,11 @@ import com.vaadin.flow.component.HasValueAndElement;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.grid.ColumnPathRenderer;
-import com.vaadin.flow.component.grid.FilterFieldDto;
 import com.vaadin.flow.component.grid.FilterField;
+import com.vaadin.flow.component.grid.FilterFieldDto;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.grid.SortOrderProvider;
 import com.vaadin.flow.component.grid.Grid.Column;
+import com.vaadin.flow.component.grid.SortOrderProvider;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -197,5 +197,14 @@ public class EnhancedColumn<T> extends Grid.Column<T> {
 	@Override
 	public EnhancedColumn<T> setSortable(boolean sortable) {
 		return (EnhancedColumn<T>) super.setSortable(sortable);
+	}
+	
+	/**
+	 * @see Column#setResizable(boolean)
+	 * 
+	 */
+	@Override
+	public EnhancedColumn<T> setResizable(boolean resizable) {
+		return  (EnhancedColumn<T>)super.setResizable(resizable);
 	}
 }
