@@ -77,7 +77,11 @@ public class TextFieldFilterDto implements FilterFieldDto<String> {
 	
 	@Override
 	public Predicate<String> getFilterPredicate() {
-		Predicate<String> simplePredicate = StringUtils.isNotBlank(filterValue) ? s -> s.contains(filterValue) : s -> true;
+		Predicate<String> simplePredicate;
+		if(StringUtils.isBlank(filterValue)) {
+			return s -> true;
+		} 
+		
 		if(regularExpression) {
 			if(wholeField) {
 				simplePredicate = caseSensitive ? s -> Pattern.compile(filterValue.concat("\b")).matcher(s).find() : s -> Pattern.compile(filterValue.concat("\b"), Pattern.CASE_INSENSITIVE).matcher(s).find();
@@ -87,8 +91,10 @@ public class TextFieldFilterDto implements FilterFieldDto<String> {
 		} else if(wholeField){			
 			simplePredicate = caseSensitive ? s -> s.equals(filterValue) : s -> s.equalsIgnoreCase(filterValue);			
 		} else if(caseSensitive) {
-			simplePredicate = s -> s.equals(filterValue);
-		} 
+			simplePredicate = s -> s.contains(filterValue);
+		} else {
+			simplePredicate = s -> s.toUpperCase().contains(filterValue.toUpperCase());
+		}
 			
 		return invertResult ? simplePredicate.negate() : simplePredicate;		
 	}
