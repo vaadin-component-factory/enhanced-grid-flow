@@ -31,9 +31,12 @@ public class DepartmentService {
                 .anyMatch(department -> Objects.equals(parent, department.getParent()));
     }
 
-    public List<Department> fetchChildren(Department parent) {
+    public List<Department> fetchChildren(Department parent, int limit, int offset) {
         return departmentList.stream()
-                .filter(department -> Objects.equals(parent, department.getParent())).collect(Collectors.toList());
+                .filter(department -> Objects.equals(parent, department.getParent()))
+                .skip(offset)
+                .limit(limit)
+                .collect(Collectors.toList());
     }
 	
     public int getChildCount(Department parent, Optional<Filter<Department>> filter) {
@@ -65,7 +68,7 @@ public class DepartmentService {
 			}
 			if (!departmentSort.isDescending()) comparator = comparator.reversed();
 		}
-		List<Department> sortedList = new LinkedList<>(this.fetchChildren(parent));
+		List<Department> sortedList = new LinkedList<>(this.getChildren(parent));
 		sortedList.sort(comparator);
     	
     	// get filter predicate
@@ -85,5 +88,10 @@ public class DepartmentService {
     	return result;
     }
 
+    private List<Department> getChildren(Department parent){
+        return departmentList.stream()
+                .filter(department -> Objects.equals(parent, department.getParent()))
+                .collect(Collectors.toList());
+    }
     
 }

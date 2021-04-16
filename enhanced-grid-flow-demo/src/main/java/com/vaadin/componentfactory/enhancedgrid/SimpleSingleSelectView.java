@@ -1,9 +1,9 @@
 package com.vaadin.componentfactory.enhancedgrid;
 
+import java.util.Comparator;
 import java.util.List;
 
 import com.vaadin.componentfactory.enhancedgrid.bean.Person;
-import com.vaadin.componentfactory.enhancedgrid.bean.PersonSort;
 import com.vaadin.componentfactory.enhancedgrid.filtering.TextFieldFilterDto;
 import com.vaadin.componentfactory.enhancedgrid.filtering.TextFilterField;
 import com.vaadin.componentfactory.enhancedgrid.service.PersonService;
@@ -36,7 +36,7 @@ public class SimpleSingleSelectView extends Div {
 
         List<Person> personList = getItems();
         EnhancedGrid<Person> grid = new EnhancedGrid<>();
-        
+                
         // set selection predicate to indicate which items can be selected
         grid.setSelectionPredicate(p -> p.getAge() > 18);
         grid.setItems(personList);
@@ -48,9 +48,9 @@ public class SimpleSingleSelectView extends Div {
         grid.addColumn(Person::getLastName).setHeader("Last Name", new TextFilterField(new TextFieldFilterDto("Allen")));
         // age column with renderer
         NumberRenderer<Person> ageRenderer = new NumberRenderer<Person>(Person::getAge, "Age: %d");
-        EnhancedColumn<Person> ageColumn = grid.addColumn(ageRenderer, PersonSort.AGE).setHeader("Age", new TextFilterField());
+        EnhancedColumn<Person> ageColumn = grid.addColumn(ageRenderer).setComparator(Comparator.comparing(Person::getAge)).setHeader("Age", new TextFilterField());
         ageColumn.setValueProvider(p -> String.valueOf(p.getAge()));
-        
+                      
         // add pre-selected descendent order for first name column
         List<GridSortOrder<Person>> sortByFirstName = new GridSortOrderBuilder<Person>()
     	      .thenDesc(firstNameColumn).build();
@@ -120,8 +120,9 @@ public class SimpleSingleSelectView extends Div {
         // add button to clear all sorting
         Button clearSortingButton = new Button("Clear Sorting", e -> grid.sort(null));
         horizontalLayout.add(clearSortingButton);            
-         
-        add(grid, messageDiv, horizontalLayout);
+       
+        add( grid, messageDiv, horizontalLayout);
+   
     }
 
     private List<Person> getItems() {

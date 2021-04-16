@@ -20,16 +20,18 @@ package com.vaadin.componentfactory.enhancedgrid;
  * #L%
  */
 
+import java.util.Comparator;
+
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.HasValueAndElement;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.grid.ColumnPathRenderer;
-import com.vaadin.flow.component.grid.FilterFieldDto;
 import com.vaadin.flow.component.grid.FilterField;
+import com.vaadin.flow.component.grid.FilterFieldDto;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.grid.SortOrderProvider;
 import com.vaadin.flow.component.grid.Grid.Column;
+import com.vaadin.flow.component.grid.SortOrderProvider;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -198,4 +200,32 @@ public class EnhancedColumn<T> extends Grid.Column<T> {
 	public EnhancedColumn<T> setSortable(boolean sortable) {
 		return (EnhancedColumn<T>) super.setSortable(sortable);
 	}
+	
+	/**
+	 * @see Column#setResizable(boolean)
+	 * 
+	 */
+	@Override
+	public EnhancedColumn<T> setResizable(boolean resizable) {
+		return  (EnhancedColumn<T>)super.setResizable(resizable);
+	}
+	
+	/**
+	 * @see Column#setComparator(ValueProvider)
+	 * 
+	 */
+	@Override
+	public <V extends Comparable<? super V>> EnhancedColumn<T> setComparator(ValueProvider<T, V> keyExtractor) {
+		return (EnhancedColumn<T>)super.setComparator(keyExtractor);
+	}
+	
+	/**
+	 * @see Column#setComparator(Comparator)
+	 * 
+	 */
+	@Override
+	public EnhancedColumn<T> setComparator(Comparator<T> comparator) {
+		return (EnhancedColumn<T>)super.setComparator(comparator);
+	}
+		
 }
