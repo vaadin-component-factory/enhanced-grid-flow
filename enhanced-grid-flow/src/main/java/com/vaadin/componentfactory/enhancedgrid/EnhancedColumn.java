@@ -31,6 +31,7 @@ import com.vaadin.flow.component.grid.FilterField;
 import com.vaadin.flow.component.grid.FilterFieldDto;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
+import com.vaadin.flow.component.grid.GridSorterFilterComponentRenderer;
 import com.vaadin.flow.component.grid.SortOrderProvider;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.icon.Icon;
@@ -45,6 +46,7 @@ import com.vaadin.flow.function.ValueProvider;
  *  
  */
 @CssImport(value = "./styles/enhanced-column.css")
+@CssImport(value = "./styles/enhanced-column-sorter.css", themeFor = "vaadin-grid-sorter")
 public class EnhancedColumn<T> extends Grid.Column<T> {
 
 	private HasValueAndElement<?, ? extends FilterFieldDto> filter;
@@ -73,8 +75,8 @@ public class EnhancedColumn<T> extends Grid.Column<T> {
 		if(filter != null) {
 			Component headerComponent = new Div();
 	        headerComponent.getElement().setText(labelText);
-	        addFilterButtonToHeader(headerComponent, filter);			
-			return setHeader(headerComponent); 
+	        addFilterButtonToHeader(headerComponent, filter);		
+	        return setHeader(headerComponent); 
 		}		
 		return setHeader(labelText);
     }
@@ -85,7 +87,7 @@ public class EnhancedColumn<T> extends Grid.Column<T> {
 		}				
 		return setHeader(headerComponent);		
 	}
-	
+		
 	/**
 	 * @see Column#setHeader(Component)
 	 * 
@@ -111,7 +113,10 @@ public class EnhancedColumn<T> extends Grid.Column<T> {
 		filterButton = new Button(new Icon(VaadinIcon.FILTER));
         filterButton.setId("filter-button");
         filterButton.addClassName("filter-not-selected");
-        
+        filterButton.getElement().addEventListener("click", click -> {
+			//do nothing
+        }).addEventData("event.stopPropagation()");
+                
         // add filter field popup and set filter as it's filter component
         filterField = new FilterField();
         filterField.setFor(filterButton.getId().get());
@@ -127,17 +132,14 @@ public class EnhancedColumn<T> extends Grid.Column<T> {
            		}
            	}  	
         });
-         
-        // this is needed to avoid issues when adding popup
+                 
         headerComponent.getElement().appendChild(filterButton.getElement());
+        // this is needed to avoid js issues when adding popup
         headerComponent.getElement().executeJs("return").then(ignore -> {
         	headerComponent.getElement().appendChild(filterField.getElement());
-        	if(this.isSortable()) {
-        		headerComponent.getElement().executeJs("this.parentElement.parentElement.root.querySelector('[part=indicators]').style.marginLeft='-50px'");
-        	}
-        });
+        }); 
 	}
-
+		
 	HasValueAndElement<?, ? extends FilterFieldDto> getFilter() {
 		return filter; 
 	}	
@@ -228,4 +230,9 @@ public class EnhancedColumn<T> extends Grid.Column<T> {
 		return (EnhancedColumn<T>)super.setComparator(comparator);
 	}
 		
+	@Override
+	protected void setHeaderComponent(Component component) {		
+		super.setHeaderRenderer(new GridSorterFilterComponentRenderer<>(this, component));
+	}
+
 }
