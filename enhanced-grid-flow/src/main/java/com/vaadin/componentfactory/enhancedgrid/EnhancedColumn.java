@@ -153,15 +153,16 @@ public class EnhancedColumn<T> extends Grid.Column<T> {
 			filterButton.getClassNames().add("filter-selected");
 		}
 	}
-
+	
 	ValueProvider<T, ?> getValueProvider(){
-		if (this.getRenderer() instanceof ColumnPathRenderer) { 
-			valueProvider = ((ColumnPathRenderer<T>)this.getRenderer()).getValueProviders().values().iterator().next();
-		} else if(valueProvider == null){
+		if (this.valueProvider != null) {
+			 return this.valueProvider;
+		} else if (this.getRenderer() instanceof ColumnPathRenderer) { 
+			return ((ColumnPathRenderer<T>)this.getRenderer()).getValueProviders().values().iterator().next();
+		} else {
 			throw new UnsupportedOperationException("Value provider for column is unknown. "
 					+ "Please set one calling setValueProvider method.");
 		}
-		return valueProvider;
 	}
 
 	public void setValueProvider(ValueProvider<T, ?> valueProvider) {

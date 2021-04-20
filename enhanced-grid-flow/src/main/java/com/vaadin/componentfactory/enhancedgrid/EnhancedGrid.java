@@ -378,7 +378,7 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver, App
 	 */
 	@Override
 	protected BiFunction<Renderer<T>, String, Column<T>> getDefaultColumnFactory() {
-		return (renderer, columnId) -> new EnhancedColumn(this, columnId, renderer);
+		return (renderer, columnId) -> new EnhancedColumn<>(this, columnId, renderer);
 	}
 	
 	/**
@@ -387,9 +387,17 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver, App
 	 */
 	@Override
 	public EnhancedColumn<T> addColumn(ValueProvider<T, ?> valueProvider) {
-        BiFunction<Renderer<T>, String, Column<T>> defaultFactory = getDefaultColumnFactory();
-        return (EnhancedColumn<T>) super.addColumn(valueProvider, defaultFactory);
+        return (EnhancedColumn<T>) super.addColumn(valueProvider);
     }
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	protected <C extends Column<T>> C addColumn(ValueProvider<T, ?> valueProvider,
+		BiFunction<Renderer<T>, String, C> columnFactory) {
+		EnhancedColumn<T> column = (EnhancedColumn<T>) super.addColumn(valueProvider, columnFactory);
+		column.setValueProvider(valueProvider);
+		return (C) column;
+	}
 	
 	/**
 	 * @see Grid#addColumn(ValueProvider, String...)
@@ -426,6 +434,15 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver, App
 	@Override
 	public <V extends Component> EnhancedColumn<T> addComponentColumn(ValueProvider<T, V> componentProvider) {
 		return (EnhancedColumn<T>) super.addComponentColumn(componentProvider);
+	}
+	
+	/**
+	 * @see Grid#getColumnByKey(String)
+	 * 
+	 */
+	@Override
+	public EnhancedColumn<T> getColumnByKey(String columnKey) {
+		return (EnhancedColumn<T>) super.getColumnByKey(columnKey);
 	}
 	
 	@Override
