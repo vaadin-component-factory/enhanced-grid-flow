@@ -447,6 +447,10 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver, App
 	public EnhancedColumn<T> getColumnByKey(String columnKey) {
 		return (EnhancedColumn<T>) super.getColumnByKey(columnKey);
 	}
+
+	protected void setColumnKey(String key, EnhancedColumn<T> column) {
+		super.setColumnKey(key, column);
+	}
 	
 	@Override
 	public void onApplyFilter(Object filter) {

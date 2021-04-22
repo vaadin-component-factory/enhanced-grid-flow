@@ -280,4 +280,13 @@ public class EnhancedColumn<T> extends Grid.Column<T> {
                 "<enhanced-grid-sorter path='%s'" + sortable + filtered +">%s</enhanced-grid-sorter>",
                 escapedColumnId, templateInnerHtml);
 	}
+	
+	/**
+	 * @see Column#setKey(String)
+	 * 
+	 */
+	@Override
+	public EnhancedColumn<T> setKey(String key) {
+		return (EnhancedColumn<T>) super.setKey(key);
+	}
 }
