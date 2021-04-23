@@ -24,8 +24,7 @@ import java.util.Comparator;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.HasValueAndElement;
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.dependency.CssImport;
+import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.grid.ColumnPathRenderer;
 import com.vaadin.flow.component.grid.FilterField;
 import com.vaadin.flow.component.grid.FilterFieldDto;
@@ -34,10 +33,10 @@ import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.grid.GridSorterFilterComponentRenderer;
 import com.vaadin.flow.component.grid.SortOrderProvider;
 import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.icon.Icon;
-import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.data.renderer.Renderer;
 import com.vaadin.flow.function.ValueProvider;
+import com.vaadin.flow.internal.HtmlUtils;
 
 /**
  * 
@@ -45,8 +44,7 @@ import com.vaadin.flow.function.ValueProvider;
  * and a {@link FilterField filter component} to perform column's filtering.
  *  
  */
-@CssImport(value = "./styles/enhanced-column.css")
-@CssImport(value = "./styles/enhanced-column-sorter.css", themeFor = "vaadin-grid-sorter")
+@JsModule(value = "./src/enhanced-grid-sorter.js")
 public class EnhancedColumn<T> extends Grid.Column<T> {
 
 	private HasValueAndElement<?, ? extends FilterFieldDto> filter;
@@ -55,10 +53,10 @@ public class EnhancedColumn<T> extends Grid.Column<T> {
 	
 	private EnhancedGrid<T> grid;
 	
-	private Button filterButton;
-	
 	private FilterField filterField;
 	
+	private Component headerComponent;
+			
 	/**
 	 * @see Column#Column(Grid, String, Renderer)
 	 * 
@@ -73,7 +71,7 @@ public class EnhancedColumn<T> extends Grid.Column<T> {
 	
 	public EnhancedColumn<T> setHeader(String labelText, HasValueAndElement<?, ? extends FilterFieldDto> filter) {	
 		if(filter != null) {
-			Component headerComponent = new Div();
+			Component headerComponent = new Span();
 	        headerComponent.getElement().setText(labelText);
 	        addFilterButtonToHeader(headerComponent, filter);		
 	        return setHeader(headerComponent); 
@@ -108,18 +106,10 @@ public class EnhancedColumn<T> extends Grid.Column<T> {
 	
 	private void addFilterButtonToHeader(Component headerComponent, HasValueAndElement<?, ? extends FilterFieldDto> filter) {
 		this.filter = filter;
-		
-		// add filter button
-		filterButton = new Button(new Icon(VaadinIcon.FILTER));
-        filterButton.setId("filter-button");
-        filterButton.addClassName("filter-not-selected");
-        filterButton.getElement().addEventListener("click", click -> {
-			//do nothing
-        }).addEventData("event.stopPropagation()");
+		this.headerComponent = headerComponent;
                 
-        // add filter field popup and set filter as it's filter component
+        // add filter field (popup component) and set filter as it's filter component
         filterField = new FilterField();
-        filterField.setFor(filterButton.getId().get());
         filterField.addApplyFilterListener(grid);
         filterField.addFilterComponent(filter.getElement().getComponent().get());
         
@@ -132,36 +122,55 @@ public class EnhancedColumn<T> extends Grid.Column<T> {
            		}
            	}  	
         });
+        
+        // need to add a not visible component so filterField (popup component) can be open
+        Div div = new Div();
+        div.setId(getInternalId());       
+        div.getElement().getStyle().set("display", "inline-block");
+		filterField.setFor(div.getId().get());		
+		headerComponent.getElement().appendChild(div.getElement());
                  
-        headerComponent.getElement().appendChild(filterButton.getElement());
         // this is needed to avoid js issues when adding popup
         headerComponent.getElement().executeJs("return").then(ignore -> {
         	headerComponent.getElement().appendChild(filterField.getElement());
-        }); 
+        });
+                
+        grid.addFilterClickedEventListener(e -> {
+           	if(e.buttonId.equals(getInternalId())) {
+        		if(filterField.isOpened()) {
+        			filterField.hide();
+        		} else {
+        			filterField.show();
+        		}
+        	}
+		});
 	}
-		
+	
 	HasValueAndElement<?, ? extends FilterFieldDto> getFilter() {
 		return filter; 
 	}	
 	
 	void updateFilterButtonStyle(){
-		if(filter.isEmpty()) {
-			filterButton.getClassNames().remove("filter-selected");
-			filterButton.getClassNames().add("filter-not-selected");			
-		} else {
-			filterButton.getClassNames().remove("filter-not-selected");
-			filterButton.getClassNames().add("filter-selected");
-		}
+		if(headerComponent != null) {
+			headerComponent.getElement().executeJs("return").then(ignore -> {
+				if(hasFilterSelected()) {
+	        		headerComponent.getElement().executeJs("this.parentElement.parentElement._setProperty('filtered', true)");
+				} else {
+					headerComponent.getElement().executeJs("this.parentElement.parentElement._setProperty('filtered', false);");
+				}
+	        });
+		}		
 	}
-
+	
 	ValueProvider<T, ?> getValueProvider(){
-		if (this.getRenderer() instanceof ColumnPathRenderer) { 
-			valueProvider = ((ColumnPathRenderer<T>)this.getRenderer()).getValueProviders().values().iterator().next();
-		} else if(valueProvider == null){
+		if (this.valueProvider != null) {
+			 return this.valueProvider;
+		} else if (this.getRenderer() instanceof ColumnPathRenderer) { 
+			return ((ColumnPathRenderer<T>)this.getRenderer()).getValueProviders().values().iterator().next();
+		} else {
 			throw new UnsupportedOperationException("Value provider for column is unknown. "
 					+ "Please set one calling setValueProvider method.");
 		}
-		return valueProvider;
 	}
 
 	public void setValueProvider(ValueProvider<T, ?> valueProvider) {
@@ -234,5 +243,50 @@ public class EnhancedColumn<T> extends Grid.Column<T> {
 	protected void setHeaderComponent(Component component) {		
 		super.setHeaderRenderer(new GridSorterFilterComponentRenderer<>(this, component));
 	}
-
+	
+	/**
+	 * Return if column shows filter field
+	 * 
+	 * @return
+	 */
+	public boolean isFilterable() {
+		return filterField != null;
+	}
+	
+	/**
+	 * Returns if column is filtered
+	 * 
+	 * @return
+	 */
+	public boolean hasFilterSelected() {
+		return filter != null && !filter.isEmpty();
+	}
+			
+	/**
+	 * Add enhanced-grid-sorter element to header template. 
+	 * 
+	 * This element is an extension of vaadin-grid-sorter that also
+	 * adds the filtering button to the header.
+	 * 
+	 * @param templateInnerHtml
+	 * @return
+	 */
+	public String addEnhancedGridSorter(String templateInnerHtml) {
+		String escapedColumnId = HtmlUtils
+                .escape(this.getInternalId());
+		String sortable = isSortable() ? " sortable" : "";
+		String filtered = hasFilterSelected() ? " filtered" : "";
+        return String.format(
+                "<enhanced-grid-sorter path='%s'" + sortable + filtered +">%s</enhanced-grid-sorter>",
+                escapedColumnId, templateInnerHtml);
+	}
+	
+	/**
+	 * @see Column#setKey(String)
+	 * 
+	 */
+	@Override
+	public EnhancedColumn<T> setKey(String key) {
+		return (EnhancedColumn<T>) super.setKey(key);
+	}
 }

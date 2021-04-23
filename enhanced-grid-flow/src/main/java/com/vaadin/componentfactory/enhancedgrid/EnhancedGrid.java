@@ -28,6 +28,7 @@ import java.util.function.Predicate;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEvent;
+import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.ComponentUtil;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.grid.ApplyFilterListener;
@@ -35,6 +36,7 @@ import com.vaadin.flow.component.grid.CancelEditConfirmDialog;
 import com.vaadin.flow.component.grid.CustomAbstractGridMultiSelectionModel;
 import com.vaadin.flow.component.grid.CustomAbstractGridSingleSelectionModel;
 import com.vaadin.flow.component.grid.Filter;
+import com.vaadin.flow.component.grid.FilterClickedEvent;
 import com.vaadin.flow.component.grid.FilterField;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridArrayUpdater;
@@ -54,6 +56,7 @@ import com.vaadin.flow.function.ValueProvider;
 import com.vaadin.flow.router.BeforeLeaveEvent;
 import com.vaadin.flow.router.BeforeLeaveEvent.ContinueNavigationAction;
 import com.vaadin.flow.router.BeforeLeaveObserver;
+import com.vaadin.flow.shared.Registration;
 
 import elemental.json.JsonObject;
 
@@ -378,7 +381,7 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver, App
 	 */
 	@Override
 	protected BiFunction<Renderer<T>, String, Column<T>> getDefaultColumnFactory() {
-		return (renderer, columnId) -> new EnhancedColumn(this, columnId, renderer);
+		return (renderer, columnId) -> new EnhancedColumn<>(this, columnId, renderer);
 	}
 	
 	/**
@@ -387,9 +390,17 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver, App
 	 */
 	@Override
 	public EnhancedColumn<T> addColumn(ValueProvider<T, ?> valueProvider) {
-        BiFunction<Renderer<T>, String, Column<T>> defaultFactory = getDefaultColumnFactory();
-        return (EnhancedColumn<T>) super.addColumn(valueProvider, defaultFactory);
+        return (EnhancedColumn<T>) super.addColumn(valueProvider);
     }
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	protected <C extends Column<T>> C addColumn(ValueProvider<T, ?> valueProvider,
+		BiFunction<Renderer<T>, String, C> columnFactory) {
+		EnhancedColumn<T> column = (EnhancedColumn<T>) super.addColumn(valueProvider, columnFactory);
+		column.setValueProvider(valueProvider);
+		return (C) column;
+	}
 	
 	/**
 	 * @see Grid#addColumn(ValueProvider, String...)
@@ -426,6 +437,19 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver, App
 	@Override
 	public <V extends Component> EnhancedColumn<T> addComponentColumn(ValueProvider<T, V> componentProvider) {
 		return (EnhancedColumn<T>) super.addComponentColumn(componentProvider);
+	}
+	
+	/**
+	 * @see Grid#getColumnByKey(String)
+	 * 
+	 */
+	@Override
+	public EnhancedColumn<T> getColumnByKey(String columnKey) {
+		return (EnhancedColumn<T>) super.getColumnByKey(columnKey);
+	}
+
+	protected void setColumnKey(String key, EnhancedColumn<T> column) {
+		super.setColumnKey(key, column);
 	}
 	
 	@Override
@@ -487,7 +511,18 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver, App
 			}
 		}
 		applyFilter();		
-	}
-
+	}	
+	
+	/**
+    * Add listener on filter-clicked event.
+    * 
+    * @param listener
+    * @return registration which can remove the listener.
+    */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+	public Registration addFilterClickedEventListener(ComponentEventListener<FilterClickedEvent<T>> listener) {
+       return addListener(FilterClickedEvent.class, (ComponentEventListener) listener);
+   }
+	   
 }
 

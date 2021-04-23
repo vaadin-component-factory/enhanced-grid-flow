@@ -96,16 +96,22 @@ public class GridSorterFilterComponentRenderer <SOURCE>
         }
         
         /*
-         * The renderer must set the base header template back to the column, so
+         * The renderer must set the base header template back to the column, so 
          * if/when the sortable state is changed by the developer, the column
          * knows how to add or remove the grid sorter.
          */
         column.setBaseHeaderTemplate(templateInnerHtml);
-        if (column.hasSortingIndicators()) {
-            templateInnerHtml = column.addGridSorter(templateInnerHtml)
-            		.replace("<vaadin-grid-sorter", "<vaadin-grid-sorter class='enhanced-grid-sorter'");
+        if (column.hasSortingIndicators() && !column.isFilterable()) {
+            templateInnerHtml = column.addGridSorter(templateInnerHtml);
         }
 
+        if(column.isFilterable()) {
+        	String gridSorter = column.isSortable() ? column.addGridSorter("")
+        			.replaceFirst(">", "style='display:none' slot='direction'>") : "";
+        	templateInnerHtml = column.addEnhancedGridSorter(templateInnerHtml);
+        	templateInnerHtml = templateInnerHtml.replaceFirst(">", ">" + gridSorter);
+        }
+        
         templateElement.setProperty("innerHTML", templateInnerHtml);
     }
 

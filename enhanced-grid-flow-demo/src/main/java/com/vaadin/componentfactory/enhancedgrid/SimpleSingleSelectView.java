@@ -43,14 +43,14 @@ public class SimpleSingleSelectView extends Div {
      
         // add columns
         // first name column with filtering button on header
-        EnhancedColumn<Person> firstNameColumn = grid.addColumn(Person::getFirstName).setHeader("First Name", new TextFilterField());
+        EnhancedColumn<Person> firstNameColumn = grid.addColumn(Person::getFirstName).setHeader("First Name", new TextFilterField()).setResizable(true);
         // last name column with filtering button and pre-selected filter by last name = "Allen"
-        grid.addColumn(Person::getLastName).setHeader("Last Name", new TextFilterField(new TextFieldFilterDto("Allen")));
+        grid.addColumn(Person::getLastName).setHeader("Last Name", new TextFilterField(new TextFieldFilterDto("Allen"))).setResizable(true);
         // age column with renderer
         NumberRenderer<Person> ageRenderer = new NumberRenderer<Person>(Person::getAge, "Age: %d");
         EnhancedColumn<Person> ageColumn = grid.addColumn(ageRenderer).setComparator(Comparator.comparing(Person::getAge)).setHeader("Age", new TextFilterField());
         ageColumn.setValueProvider(p -> String.valueOf(p.getAge()));
-                      
+                                      
         // add pre-selected descendent order for first name column
         List<GridSortOrder<Person>> sortByFirstName = new GridSortOrderBuilder<Person>()
     	      .thenDesc(firstNameColumn).build();
