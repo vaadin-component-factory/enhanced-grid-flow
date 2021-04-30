@@ -25,6 +25,7 @@ import java.util.Comparator;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.HasValueAndElement;
 import com.vaadin.flow.component.dependency.JsModule;
+import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.grid.ColumnPathRenderer;
 import com.vaadin.flow.component.grid.FilterField;
 import com.vaadin.flow.component.grid.FilterFieldDto;
@@ -34,6 +35,7 @@ import com.vaadin.flow.component.grid.GridSorterFilterComponentRenderer;
 import com.vaadin.flow.component.grid.SortOrderProvider;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.data.renderer.Renderer;
 import com.vaadin.flow.function.ValueProvider;
 import com.vaadin.flow.internal.HtmlUtils;
@@ -44,6 +46,7 @@ import com.vaadin.flow.internal.HtmlUtils;
  * and a {@link FilterField filter component} to perform column's filtering.
  *  
  */
+@Uses(Icon.class)
 @JsModule(value = "./src/enhanced-grid-sorter.js")
 public class EnhancedColumn<T> extends Grid.Column<T> {
 
