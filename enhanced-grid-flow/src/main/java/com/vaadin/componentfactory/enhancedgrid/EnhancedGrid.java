@@ -327,7 +327,7 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver, App
     	}      
     }
     
-    private void cancelEditItem(T newEditItem, ContinueNavigationAction action, SerializableRunnable onCancelCallback) {
+    protected void cancelEditItem(T newEditItem, ContinueNavigationAction action, SerializableRunnable onCancelCallback) {
     	String text = getTranslation(CANCEL_EDIT_MSG_KEY);
     	String confirmText = getTranslation(CANCEL_EDIT_CONFIRM_BTN_KEY); 
     	String cancelText = getTranslation(CANCEL_EDIT_CANCEL_BTN_KEY);
