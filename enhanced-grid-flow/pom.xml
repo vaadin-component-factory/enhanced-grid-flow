@@ -6,7 +6,7 @@
 
     <groupId>com.vaadin.componentfactory</groupId>
     <artifactId>enhanced-grid-flow</artifactId>
-    <version>0.7.0</version>
+    <version>0.8.0</version>
     <packaging>jar</packaging>
 
     <name>Enhanced Grid</name>
