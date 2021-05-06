@@ -132,11 +132,9 @@ public class EnhancedColumn<T> extends Grid.Column<T> {
         div.getElement().getStyle().set("display", "inline-block");
 		filterField.setFor(div.getId().get());		
 		headerComponent.getElement().appendChild(div.getElement());
-                 
-        // this is needed to avoid js issues when adding popup
-        headerComponent.getElement().executeJs("return").then(ignore -> {
-        	headerComponent.getElement().appendChild(filterField.getElement());
-        });
+
+		// add filter field to header
+       	headerComponent.getElement().appendChild(filterField.getElement());
                 
         grid.addFilterClickedEventListener(e -> {
            	if(e.buttonId.equals(getInternalId())) {
