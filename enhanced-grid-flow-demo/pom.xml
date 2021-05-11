@@ -6,7 +6,7 @@
 
     <groupId>com.vaadin.componentfactory</groupId>
     <artifactId>enhanced-grid-flow-demo</artifactId>
-    <version>0.8.0</version>
+    <version>0.9.0</version>
 
     <name>Enhanced Grid Demo</name>
     <packaging>war</packaging>
@@ -106,7 +106,7 @@
        <dependency>
            <groupId>com.vaadin.componentfactory</groupId>
            <artifactId>enhanced-grid-flow</artifactId>
-           <version>0.8.0</version>
+           <version>0.9.0</version>
        </dependency>
 
         <dependency>
