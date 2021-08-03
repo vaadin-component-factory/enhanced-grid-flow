@@ -37,3 +37,6 @@ webpack.config.js
 webpack.generated.js
 
 enhanced-grid-flow/src/main/resources/rebel.xml
+.classpath
+.project
+.settings
