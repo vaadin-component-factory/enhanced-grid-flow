@@ -94,7 +94,16 @@ class EnhancedGridSorterElement extends GridSorterElement {
  _onClick(e) {
    if(this.sortable) {
 	   super._onClick(e);
-   } 
+     this._updateSorterDirection();
+     } 
+ }
+
+ /** @private */
+ _updateSorterDirection() {
+    var sorter = this.querySelector("vaadin-grid-sorter");
+    if(sorter){
+      sorter.direction = this.direction;
+    }
  }
     
  connectedCallback () {
