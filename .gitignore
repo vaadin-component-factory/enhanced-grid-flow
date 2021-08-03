@@ -40,3 +40,4 @@ enhanced-grid-flow/src/main/resources/rebel.xml
 .classpath
 .project
 .settings
+.vscode/settings.json
