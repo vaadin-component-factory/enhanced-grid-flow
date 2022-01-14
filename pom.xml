@@ -3,7 +3,7 @@
 
     <groupId>com.vaadin.componentfactory</groupId>
     <artifactId>enhanced-grid-flow-root</artifactId>
-    <version>0.9.1</version>
+    <version>2.0.0</version>
     <packaging>pom</packaging>
     <modules>
         <module>enhanced-grid-flow</module>
@@ -13,12 +13,12 @@
     <description>enhanced-grid-flow</description>
 
     <properties>
-        <vaadin.version>14.4.4</vaadin.version>
+        <vaadin.version>22.0.2</vaadin.version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <enhanced-grid-flow.version>0.9.1</enhanced-grid-flow.version>
+        <enhanced-grid-flow.version>2.0.0</enhanced-grid-flow.version>
     </properties>
     <inceptionYear>2020</inceptionYear>
     <organization>

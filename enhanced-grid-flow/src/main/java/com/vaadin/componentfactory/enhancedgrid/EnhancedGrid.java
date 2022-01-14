@@ -175,7 +175,7 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver, App
             B dataCommunicatorBuilder) {
     	super(pageSize, updateQueueBuilder, dataCommunicatorBuilder);
     }
-    
+        
     /**
      * Define if an item can be selected.
      * 
@@ -193,14 +193,14 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver, App
     public void setSelectionPredicate(SerializablePredicate<T> selectionPredicate) {
         this.selectionPredicate = selectionPredicate;
         if (generateSelectionGenerator != null) {
-            removeDataGenerator(generateSelectionGenerator);
+          generateSelectionGenerator.destroyAllData();
         }
         generateSelectionGenerator = this::generateSelectionAccess;
         addDataGenerator(generateSelectionGenerator);
-                      
+                              
         super.setClassNameGenerator(item -> selectionDisabled.apply(item).concat(" ").concat(defaultClassNameGenerator.apply(item))); 
     }
-      
+          
 	@Override
 	public void setClassNameGenerator(SerializableFunction<T, String> classNameGenerator) {
 		defaultClassNameGenerator = classNameGenerator;	
