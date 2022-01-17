@@ -22,38 +22,38 @@
  * `<enhanced-grid-sorter>` is a helper element for the `<vaadin-grid>` that extends `<vaadin-grid-sorter>`
  * adding support to display a button for filtering
  */
-import { PolymerElement, html } from '@polymer/polymer/polymer-element.js';
-import { GridSorterElement  } from '@vaadin/vaadin-grid/vaadin-grid-sorter.js';
+import { html } from '@polymer/polymer/polymer-element.js';
+import { GridSorter } from '@vaadin/grid/vaadin-grid-sorter.js';
 
-class EnhancedGridSorterElement extends GridSorterElement {
+class EnhancedGridSorter extends GridSorter {
   static get template() {
     return html`
       <style>
-      :host(:not([sortable])) [part='indicators']::before {
-      	display: none;
-      }
+        :host(:not([sortable])) [part='indicators']::before {
+          display: none;
+        }
 
-      :host(:not([sortable])) {
-      	cursor: default;
-      }
+        :host(:not([sortable])) {
+          cursor: default;
+        }
+        
+        [part="filter-button"] {
+          font-size: var(--lumo-font-size-s);
+          background-color: transparent;
+        }
       
-	  [part="filter-button"] {
-		font-size: var(--lumo-font-size-s);
-		background-color: transparent;
-	  }
-	
-	  [part="filter-button"]:hover::before {
-		opacity: 0;
-	  }
-	
-	  :host([filtered]) [part="filter-button"] {
-		color: var(--lumo-primary-text-color);
-	  }
-	
-	  :host(:not([filtered])) [part="filter-button"] {
-		color: var(--lumo-body-text-color);
-		opacity: 0.2;
-	  }
+        [part="filter-button"]:hover::before {
+          opacity: 0;
+        }
+      
+        :host([filtered]) [part="filter-button"] {
+          color: var(--lumo-primary-text-color);
+        }
+      
+        :host(:not([filtered])) [part="filter-button"] {
+          color: var(--lumo-body-text-color);
+          opacity: 0.2;
+        }
 
       </style>
 
@@ -61,7 +61,7 @@ class EnhancedGridSorterElement extends GridSorterElement {
 
       <slot name="direction"></slot> 
       <vaadin-button theme="icon" part="filter-button" role="button" path="[[path]]" on-click="_onFilterClick">
-    	<iron-icon icon="vaadin:filter" slot="prefix" ></iron-icon>
+    	  <vaadin-icon icon="vaadin:filter" slot="prefix" ></vaadin-icon>
       </vaadin-button>
     `;
   }
@@ -88,7 +88,7 @@ class EnhancedGridSorterElement extends GridSorterElement {
     /** @private */
  _onFilterClick(e) {   
     e.stopPropagation();  
-    this.dispatchEvent(new CustomEvent('filter-clicked', { bubbles: true, composed: true, detail: { id: e.target.path } }));
+    this.dispatchEvent(new CustomEvent('filter-clicked', { bubbles: true, composed: true, detail: { id: e.target.parentElement.path } }));
  }
 
  _onClick(e) {
@@ -131,6 +131,6 @@ class EnhancedGridSorterElement extends GridSorterElement {
 
 }
 
-customElements.define(EnhancedGridSorterElement.is, EnhancedGridSorterElement);
+customElements.define(EnhancedGridSorter.is, EnhancedGridSorter);
 
-export { EnhancedGridSorterElement };
+export { EnhancedGridSorter };
