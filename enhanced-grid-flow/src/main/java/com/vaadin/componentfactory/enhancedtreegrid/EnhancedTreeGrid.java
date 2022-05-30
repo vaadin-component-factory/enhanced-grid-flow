@@ -23,10 +23,13 @@ package com.vaadin.componentfactory.enhancedtreegrid;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -40,6 +43,7 @@ import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.grid.Filter;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridArrayUpdater;
+import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.grid.GridArrayUpdater.UpdateQueueData;
 import com.vaadin.flow.component.grid.dataview.GridDataView;
 import com.vaadin.flow.component.grid.dataview.GridLazyDataView;
@@ -152,8 +156,13 @@ public class EnhancedTreeGrid<T> extends EnhancedGrid<T> implements HasHierarchi
 		}
 	}
 	
-	private final ValueProvider<T, String> defaultUniqueKeyProvider = item -> String
-	    .valueOf(item.hashCode());
+	private final AtomicLong uniqueKeyCounter = new AtomicLong(0);
+    private final Map<Object, Long> objectUniqueKeyMap = new HashMap<>();
+	
+    ValueProvider<T, String> defaultUniqueKeyProvider = item -> String.valueOf(
+        objectUniqueKeyMap.computeIfAbsent(getDataProvider().getId(item),
+                key -> uniqueKeyCounter.getAndIncrement()));
+
 	
 	private Registration dataProviderRegistration;
 	
@@ -477,57 +486,57 @@ public class EnhancedTreeGrid<T> extends EnhancedGrid<T> implements HasHierarchi
     }
 
     
-	/**
-	* Adds a new Hierarchy column to this {@link Grid} with a value provider.
-	* The value is converted to String when sent to the client by using
-	* {@link String#valueOf(Object)}.
-	* <p>
-	* Hierarchy column is rendered by using 'vaadin-grid-tree-toggle' web
-	* component.
-	*
-	* @param valueProvider
-	*            the value provider
-	* @return the created hierarchy column
-	*/
-	public EnhancedColumn<T> addHierarchyColumn(ValueProvider<T, ?> valueProvider) {
-		EnhancedColumn<T> column = addColumn(TemplateRenderer
-		        .<T> of("<vaadin-grid-tree-toggle "
-		                + "leaf='[[item.leaf]]' expanded='{{expanded}}' level='[[level]]'>[[item.name]]"
-		                + "</vaadin-grid-tree-toggle>")
-		        .withProperty("leaf",
-		                item -> !getDataCommunicator().hasChildren(item))
-		        .withProperty("name",
-		                value -> String.valueOf(valueProvider.apply(value))));
-		final SerializableComparator<T> comparator = 
-		        (a, b) -> compareMaybeComparables(valueProvider.apply(a),
-		                valueProvider.apply(b));
-		column.setComparator(comparator);
+    /**
+     * Adds a new Hierarchy column to this {@link Grid} with a value provider.
+     * The value is converted to String when sent to the client by using
+     * {@link String#valueOf(Object)}.
+     * <p>
+     * Hierarchy column is rendered by using 'vaadin-grid-tree-toggle' web
+     * component.
+     *
+     * @param valueProvider
+     *            the value provider
+     * @return the created hierarchy column
+     */
+    public EnhancedColumn<T> addHierarchyColumn(ValueProvider<T, ?> valueProvider) {
+        EnhancedColumn<T> column = addColumn(TemplateRenderer
+                .<T> of("<vaadin-grid-tree-toggle "
+                        + "leaf='[[!item.children]]' expanded='{{expanded}}' level='[[level]]'>[[item.name]]"
+                        + "</vaadin-grid-tree-toggle>")
+                .withProperty("children",
+                        item -> getDataCommunicator().hasChildren(item))
+                .withProperty("name",
+                        value -> String.valueOf(valueProvider.apply(value))));
+        final SerializableComparator<T> comparator = (a,
+                b) -> compareMaybeComparables(valueProvider.apply(a),
+                        valueProvider.apply(b));
+        column.setComparator(comparator);
+
+        return column;
+    }
 	
-	return column;
-	}
-	
-	/**
-	* Adds a new Hierarchy column that shows components.
-	* <p>
-	* <em>NOTE:</em> Using {@link ComponentRenderer} is not as efficient as the
-	* built in renderers.
-	* </p>
-	*
-	* @param componentProvider
-	*            a value provider that will return a component for the given
-	*            item
-	* @param <V>
-	*            the component type
-	* @return the new column
-	* @see #addColumn(Renderer)
-	* @see #removeColumn(Column)
-	*/
-	public <V extends Component> EnhancedColumn<T> addComponentHierarchyColumn(
-	    ValueProvider<T, V> componentProvider) {
-		return addColumn(new HierarchyColumnComponentRenderer<V, T>(
-	        componentProvider).withProperty("leaf",
-	                item -> !getDataCommunicator().hasChildren(item)));
-	}
+    /**
+     * Adds a new Hierarchy column that shows components.
+     * <p>
+     * <em>NOTE:</em> Using {@link ComponentRenderer} is not as efficient as the
+     * built in renderers.
+     * </p>
+     *
+     * @param componentProvider
+     *            a value provider that will return a component for the given
+     *            item
+     * @param <V>
+     *            the component type
+     * @return the new column
+     * @see #addColumn(Renderer)
+     * @see #removeColumn(Column)
+     */
+    public <V extends Component> EnhancedColumn<T> addComponentHierarchyColumn(
+            ValueProvider<T, V> componentProvider) {
+        return addColumn(new HierarchyColumnComponentRenderer<V, T>(
+                componentProvider).withProperty("children",
+                        item -> getDataCommunicator().hasChildren(item)));
+    }
 	
 	
 	/**
