@@ -23,6 +23,7 @@ package com.vaadin.componentfactory.enhancedgrid;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
@@ -59,6 +60,7 @@ import com.vaadin.flow.router.BeforeLeaveObserver;
 import com.vaadin.flow.shared.Registration;
 
 import elemental.json.JsonObject;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Add a selectionPredicate to forbid the grid selection for specific rows
@@ -94,16 +96,9 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver, App
 		}
     	
 	};
-	
-	SerializableFunction<T, String> defaultClassNameGenerator = new SerializableFunction<T, String>() {
 
-    	@Override
-		public String apply(T item) {
-			return "";
-		}
-    	
-	};
-    
+    private SerializableFunction<T, String> defaultClassNameGenerator = item -> null;
+
     /**
      * @see Grid#Grid()
      */
@@ -197,16 +192,19 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver, App
         }
         generateSelectionGenerator = this::generateSelectionAccess;
         addDataGenerator(generateSelectionGenerator);
-                              
-        super.setClassNameGenerator(item -> selectionDisabled.apply(item).concat(" ").concat(defaultClassNameGenerator.apply(item))); 
+
+        setClassNameGenerator(defaultClassNameGenerator);
     }
-          
+
 	@Override
 	public void setClassNameGenerator(SerializableFunction<T, String> classNameGenerator) {
-		defaultClassNameGenerator = classNameGenerator;	
-		super.setClassNameGenerator(item -> selectionDisabled.apply(item).concat(" ").concat(defaultClassNameGenerator.apply(item)));
+	    defaultClassNameGenerator = classNameGenerator;
+		super.setClassNameGenerator(item -> {
+          String className = Optional.ofNullable(defaultClassNameGenerator.apply(item)).orElse("");
+          return StringUtils.trimToNull(selectionDisabled.apply(item) + " " + className);
+		});
 	}
-        
+
     /**
      * Add a selectionDisabled value on the client side
      *
@@ -255,37 +253,37 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver, App
             return super.setSelectionMode(selectionMode);
         }
     }
-    
-   
+
+
     /**
      * Define if an item can be edited.
-     * 
+     *
      * @param editablePredicate
      */
     public void setEditablePredicate(SerializablePredicate<T> editablePredicate) {
         this.editablePredicate = editablePredicate;
     }
-    
+
     /**
      * Return whether an item is editable or not.
-     * 
+     *
      * @param item
      * @return
      */
     public boolean isEditable(T item) {
     	return this.editablePredicate.test(item);
     }
-        
+
     /**
      * Edit the selected item.
-     * 
+     *
      * @param item
      */
     public void editItem(T item) {
         if(!isEditable(item)) {
     		return;
     	}
-        
+
         T onEditItem = this.getEditor().getItem();    	    	
     	if(onEditItem != null && item.equals(onEditItem)) {
     		return;
@@ -297,10 +295,10 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver, App
 			this.getEditor().editItem(item);
 		}        
     }
-    
+
     /**
      * Cancel the current item edition.
-     * 
+     *
      */
     public void cancelEdit() {
     	if(this.getEditor().getItem() != null) {
@@ -341,58 +339,58 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver, App
 			this.getEditor().editItem(newEditItem);
 		}
     }
-    
+
     private void onConfirmEditItem(T newEditItem, ContinueNavigationAction action) {
     	this.onConfirmEditItem(null);
-    	action.proceed(); 
+    	action.proceed();
     }
-       
+
 	/**
 	 * Set showCancelEditDialog value to know if {@link CancelEditConfirmDialog} should be displayed.
-	 * 
+	 *
 	 * @param showCancelEditDialog
 	 */
 	public void setShowCancelEditDialog(boolean showCancelEditDialog) {
 		this.showCancelEditDialog = showCancelEditDialog;
 	}
-    
+
 	/**
-	 * {@link CancelEditConfirmDialog} will be displayed if showCancelEditDialog 
+	 * {@link CancelEditConfirmDialog} will be displayed if showCancelEditDialog
 	 * is true and editor is in buffered mode.
-	 * 
+	 *
 	 * @return
 	 */
 	protected boolean allowCancelEditDialogDisplay() {
 		return showCancelEditDialog && this.getEditor().isBuffered();
-	}	
-    
+	}
+
 	@Override
 	public void beforeLeave(BeforeLeaveEvent event) {
 		T onEditItem = this.getEditor().getItem();
 		if(onEditItem != null && allowCancelEditDialogDisplay()) {
 			ContinueNavigationAction action = event.postpone();
 			cancelEditItem(null, action, null);
-		}		
-	}	
-	
+		}
+	}
+
 	/**
 	 * @see Grid#getDefaultColumnFactory()
-	 * 
+	 *
 	 */
 	@Override
 	protected BiFunction<Renderer<T>, String, Column<T>> getDefaultColumnFactory() {
 		return (renderer, columnId) -> new EnhancedColumn<>(this, columnId, renderer);
 	}
-	
+
 	/**
 	 * @see Grid#addColumn(ValueProvider)
-	 * 
+	 *
 	 */
 	@Override
 	public EnhancedColumn<T> addColumn(ValueProvider<T, ?> valueProvider) {
         return (EnhancedColumn<T>) super.addColumn(valueProvider);
     }
-	
+
 	@SuppressWarnings("unchecked")
 	@Override
 	protected <C extends Column<T>> C addColumn(ValueProvider<T, ?> valueProvider,
@@ -401,10 +399,10 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver, App
 		column.setValueProvider(valueProvider);
 		return (C) column;
 	}
-	
+
 	/**
 	 * @see Grid#addColumn(ValueProvider, String...)
-	 * 
+	 *
 	 */
 	@Override
 	public <V extends Comparable<? super V>> EnhancedColumn<T> addColumn(ValueProvider<T, V> valueProvider,
@@ -414,34 +412,34 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver, App
 
 	/**
 	 * @see Grid#addColumn(Renderer)
-	 *  
+	 *
 	 */
 	@Override
 	public EnhancedColumn<T> addColumn(Renderer<T> renderer) {
 		return (EnhancedColumn<T>) super.addColumn(renderer);
 	}
-	
+
 	/**
 	 * @see Grid#addColumn(Renderer, String...)
-	 * 
+	 *
 	 */
 	@Override
 	public EnhancedColumn<T> addColumn(Renderer<T> renderer, String... sortingProperties) {
 		return (EnhancedColumn<T>) super.addColumn(renderer, sortingProperties);
 	}
-		
+
 	/**
 	 * @see Grid#addComponentColumn(ValueProvider)
-	 * 
+	 *
 	 */
 	@Override
 	public <V extends Component> EnhancedColumn<T> addComponentColumn(ValueProvider<T, V> componentProvider) {
 		return (EnhancedColumn<T>) super.addComponentColumn(componentProvider);
 	}
-	
+
 	/**
 	 * @see Grid#getColumnByKey(String)
-	 * 
+	 *
 	 */
 	@Override
 	public EnhancedColumn<T> getColumnByKey(String columnKey) {
@@ -451,15 +449,15 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver, App
 	protected void setColumnKey(String key, EnhancedColumn<T> column) {
 		super.setColumnKey(key, column);
 	}
-	
+
 	@Override
 	public void onApplyFilter(Object filter) {
-		applyFilter();		
-	}	
-	
+		applyFilter();
+	}
+
 	/**
 	 * Apply the filters selected for each column in {@link FilterField}
-	 * 
+	 *
 	 */
 	public void applyFilter() {
 		List<Predicate<T>> predicates = new ArrayList<>();
@@ -468,54 +466,54 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver, App
 			if(enhancedColumn.getFilter() != null) {
 				ValueProvider<T, ?> columnValueProvider = enhancedColumn.getValueProvider();
 				Predicate<Object> filterPredicate = enhancedColumn.getFilter().getValue().getFilterPredicate();
-				predicates.add(p -> filterPredicate.test(columnValueProvider.apply(p))); 
+				predicates.add(p -> filterPredicate.test(columnValueProvider.apply(p)));
 				enhancedColumn.updateFilterButtonStyle();
 			}
 		}
-		
+
 		SerializablePredicate<T> finalPredicate = t -> {
 			for(Predicate<T> predicate : predicates) {
 				if(!predicate.test(t)) {
 					return false;
-				}					
+				}
 			}
 			return true;
 		};
-		
-		applyFilterPredicate(finalPredicate);		
-	}	
-	
+
+		applyFilterPredicate(finalPredicate);
+	}
+
 	/**
 	 * Apply filter predicate depending on the data provider
-	 * 
+	 *
 	 * @param finalPredicate
 	 */
 	protected void applyFilterPredicate(SerializablePredicate<T> finalPredicate) {
 		DataProvider<T, ?> dataProvider = getDataProvider();
-		if(dataProvider instanceof ListDataProvider<?>) {				
-			((ListDataProvider<T>)dataProvider).setFilter(finalPredicate);	
+		if(dataProvider instanceof ListDataProvider<?>) {
+			((ListDataProvider<T>)dataProvider).setFilter(finalPredicate);
 		} else if(dataProvider instanceof ConfigurableFilterDataProvider){
 			((ConfigurableFilterDataProvider<T, Void, Filter>)dataProvider).setFilter(new Filter<T>(finalPredicate));
 		}
 	}
-	
+
 	/**
 	 * Clear all selected filters and updates the displayed data.
-	 * 
+	 *
 	 */
 	public void clearAllFilters() {
 		for(Column<T> column : getColumns()) {
 			EnhancedColumn<T> enhancedColumn = (EnhancedColumn<T>)column;
-			if(enhancedColumn.getFilter() != null) {			
+			if(enhancedColumn.getFilter() != null) {
 				enhancedColumn.clearFilter();
 			}
 		}
-		applyFilter();		
-	}	
-	
+		applyFilter();
+	}
+
 	/**
     * Add listener on filter-clicked event.
-    * 
+    *
     * @param listener
     * @return registration which can remove the listener.
     */
@@ -523,6 +521,6 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver, App
 	public Registration addFilterClickedEventListener(ComponentEventListener<FilterClickedEvent<T>> listener) {
        return addListener(FilterClickedEvent.class, (ComponentEventListener) listener);
    }
-	   
+
 }
 
