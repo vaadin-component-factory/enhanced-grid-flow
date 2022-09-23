@@ -138,9 +138,8 @@ import { GridColumn } from '@vaadin/grid/src/vaadin-grid-column.js';
     }
 
     _onSelectClick(e) {
-        if (!e.model.item.selectionDisabled) {
-            e.currentTarget.checked ? this._grid.$connector.doDeselection([e.model.item], true) : this._grid.$connector.doSelection([e.model.item], true);
-            e.currentTarget.checked = !e.currentTarget.checked;
+        if (!e.currentTarget.__item.selectionDisabled) {
+            e.currentTarget.checked ? this._grid.$connector.doDeselection([e.currentTarget.__item], true) : this._grid.$connector.doSelection([e.currentTarget.__item], true);
         }
     }
 
