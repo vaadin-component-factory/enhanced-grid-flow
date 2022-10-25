@@ -164,7 +164,7 @@ public class EnhancedColumn<T> extends Grid.Column<T> {
 		}		
 	}
 	
-	ValueProvider<T, ?> getValueProvider(){
+	public ValueProvider<T, ?> getValueProvider(){
 		if (this.valueProvider != null) {
 			 return this.valueProvider;
 		} else if (this.getRenderer() instanceof ColumnPathRenderer) { 
