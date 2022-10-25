@@ -54,6 +54,7 @@ public class FilterField extends Popup {
 		filterComponentDiv = new Div();
 		rootLayout.add(filterComponentDiv, createButtonsLayout());
 		add(rootLayout);
+		getElement().getThemeList().add("enhanced-grid-filter-field");
 	}
 		
 	private HorizontalLayout createButtonsLayout() {
