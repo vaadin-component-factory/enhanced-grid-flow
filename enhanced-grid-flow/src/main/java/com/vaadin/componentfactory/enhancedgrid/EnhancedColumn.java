@@ -148,7 +148,7 @@ public class EnhancedColumn<T> extends Grid.Column<T> {
 		});
 	}
 	
-	HasValueAndElement<?, ? extends FilterFieldDto> getFilter() {
+	public HasValueAndElement<?, ? extends FilterFieldDto> getFilter() {
 		return filter; 
 	}	
 	
