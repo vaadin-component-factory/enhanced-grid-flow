@@ -23,6 +23,8 @@ package com.vaadin.componentfactory.enhancedgrid;
 import java.util.Comparator;
 import java.util.Optional;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.HasValueAndElement;
 import com.vaadin.flow.component.dependency.JsModule;
@@ -60,6 +62,8 @@ public class EnhancedColumn<T> extends Grid.Column<T> {
 	private FilterField filterField;
 	
 	private Component headerComponent;
+	
+	private String filterIcon;
 			
 	/**
 	 * @see Column#Column(Grid, String, Renderer)
@@ -278,9 +282,14 @@ public class EnhancedColumn<T> extends Grid.Column<T> {
                 .escape(this.getInternalId());
 		String sortable = isSortable() ? " sortable" : "";
 		String filtered = hasFilterSelected() ? " filtered" : "";
-        return String.format(
-                "<enhanced-grid-sorter path='%s'" + sortable + filtered +">%s</enhanced-grid-sorter>",
-                escapedColumnId, templateInnerHtml);
+		boolean addFilterIcon = StringUtils.isNotBlank(filterIcon); 
+		return String.format("<enhanced-grid-sorter" + (addFilterIcon ? " filtericon='" + filterIcon + "'" : "")
+				+ " path='%s'" + sortable + filtered + ">%s</enhanced-grid-sorter>",
+				escapedColumnId, templateInnerHtml);
+	}
+	
+	protected void setFilterIcon(Icon icon) {
+		filterIcon = icon.getElement().getAttribute("icon");
 	}
 	
 	/**

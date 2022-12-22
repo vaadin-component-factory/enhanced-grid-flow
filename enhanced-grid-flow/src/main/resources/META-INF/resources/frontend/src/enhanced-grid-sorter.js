@@ -61,7 +61,7 @@ class EnhancedGridSorter extends GridSorter {
 
       <slot name="direction"></slot> 
       <vaadin-button theme="icon" part="filter-button" role="button" path="[[path]]" on-click="_onFilterClick">
-    	  <vaadin-icon icon="vaadin:filter" slot="prefix" ></vaadin-icon>
+    	  <vaadin-icon icon="[[filtericon]]" slot="prefix" ></vaadin-icon>
       </vaadin-button>
     `;
   }
@@ -77,7 +77,12 @@ class EnhancedGridSorter extends GridSorter {
         type: Boolean,
         reflectToAttribute: true,
         value: false
-      }
+      },
+      filtericon: {
+		type:String,
+		reflectToAttribute: true,
+	    value: "vaadin:filter"
+	  }
     };
   }
 
