@@ -27,6 +27,7 @@ import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
+import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.ComponentEventListener;
@@ -42,6 +43,8 @@ import com.vaadin.flow.component.grid.FilterField;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridArrayUpdater;
 import com.vaadin.flow.component.grid.GridArrayUpdater.UpdateQueueData;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.grid.GridSelectionModel;
 import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
 import com.vaadin.flow.data.provider.DataGenerator;
@@ -84,6 +87,8 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver, App
     private SerializablePredicate<T> editablePredicate = item -> true;
         
     private boolean showCancelEditDialog = true;	    
+    
+    private Icon filterIcon;
     	
     SerializableFunction<T, String> selectionDisabled = new SerializableFunction<T, String>() {
 
@@ -522,5 +527,33 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver, App
        return addListener(FilterClickedEvent.class, (ComponentEventListener) listener);
    }
 
+    /**
+     * Sets an {@link Icon} to be use as the filter icon in the columns header.
+     * If not icon is specified it will display VaadinIcon.FILTER icon as default. 
+     * 
+     * @param filterIcon the icon to display as filter icon
+     */
+    public void setFilterIcon(Icon filterIcon) { 
+    	this.filterIcon = filterIcon;
+    	this.updateFilterIcon();
+	}   
+    
+    /**
+     * Updates filter icon on column's headers. 
+     */
+    private void updateFilterIcon() {
+    	if(filterIcon != null) {
+    		for(Column<T> column : getColumns()) {
+    			EnhancedColumn<T> enhancedColumn = (EnhancedColumn<T>)column;
+    			enhancedColumn.setFilterIcon(filterIcon);
+    		}	
+    	}
+    }
+    
+    @Override
+    protected void onAttach(AttachEvent attachEvent) {
+    	super.onAttach(attachEvent);
+    	this.updateFilterIcon();
+    }
 }
 
