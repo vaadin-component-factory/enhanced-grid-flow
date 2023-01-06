@@ -1,5 +1,7 @@
 package com.vaadin.flow.component.grid;
 
+import java.lang.reflect.Method;
+
 /*-
  * #%L
  * Enhanced Grid
@@ -39,9 +41,19 @@ import com.vaadin.flow.dom.Element;
 public class GridSorterFilterComponentRenderer <SOURCE>
 	extends ComponentRenderer<Component, SOURCE>{
 
+	private static final Method setBaseHeaderTemplate = getMethod(EnhancedColumn.class, "setBaseHeaderTemplate").orElse(null);
+	
 	private final EnhancedColumn<?> column;
     private final Component component;
 
+    private static Optional<Method> getMethod(Class<?> clazz, String name) {
+        try {
+          return Optional.of(clazz.getMethod(name));
+        } catch (NoSuchMethodException e) {
+          return Optional.empty();
+        }
+      }
+    
     /**
      * Creates a new renderer for a specific column, using the defined
      * component.
@@ -100,7 +112,10 @@ public class GridSorterFilterComponentRenderer <SOURCE>
          * if/when the sortable state is changed by the developer, the column
          * knows how to add or remove the grid sorter.
          */
-        column.setBaseHeaderTemplate(templateInnerHtml);
+        if(setBaseHeaderTemplate != null) {
+        	column.setBaseHeaderTemplate(templateInnerHtml);
+        }
+        
         if (column.hasSortingIndicators() && !column.isFilterable()) {
             templateInnerHtml = column.addGridSorter(templateInnerHtml);
         }
