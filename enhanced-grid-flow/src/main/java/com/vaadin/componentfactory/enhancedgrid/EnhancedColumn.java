@@ -171,8 +171,6 @@ public class EnhancedColumn<T> extends Grid.Column<T> {
 	public ValueProvider<T, ?> getValueProvider(){
 		if (this.valueProvider != null) {
 			 return this.valueProvider;
-		} else if (this.getRenderer() instanceof ColumnPathRenderer) { 
-			return ((ColumnPathRenderer<T>)this.getRenderer()).getValueProviders().values().iterator().next();
 		} else {
 			throw new UnsupportedOperationException("Value provider for column is unknown. "
 					+ "Please set one calling setValueProvider method.");
