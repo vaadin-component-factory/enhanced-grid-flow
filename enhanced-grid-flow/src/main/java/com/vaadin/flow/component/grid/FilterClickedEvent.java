@@ -20,7 +20,7 @@ package com.vaadin.flow.component.grid;
  * #L%
  */
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import com.vaadin.componentfactory.enhancedgrid.EnhancedGrid;
 import com.vaadin.flow.component.ComponentEvent;
