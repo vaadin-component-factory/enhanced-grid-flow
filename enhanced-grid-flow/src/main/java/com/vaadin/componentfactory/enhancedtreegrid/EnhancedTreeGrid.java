@@ -70,8 +70,8 @@ import com.vaadin.flow.data.provider.hierarchy.HierarchicalQuery;
 import com.vaadin.flow.data.provider.hierarchy.TreeData;
 import com.vaadin.flow.data.provider.hierarchy.TreeDataProvider;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
+import com.vaadin.flow.data.renderer.LitRenderer;
 import com.vaadin.flow.data.renderer.Renderer;
-import com.vaadin.flow.data.renderer.TemplateRenderer;
 import com.vaadin.flow.dom.DisabledUpdateMode;
 import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.function.SerializableBiFunction;
@@ -549,14 +549,23 @@ public class EnhancedTreeGrid<T> extends EnhancedGrid<T> implements HasHierarchi
      * @return the created hierarchy column
      */
     public EnhancedColumn<T> addHierarchyColumn(ValueProvider<T, ?> valueProvider) {
-        EnhancedColumn<T> column = addColumn(TemplateRenderer
-                .<T> of("<vaadin-grid-tree-toggle "
-                        + "leaf='[[!item.children]]' expanded='{{expanded}}' level='[[level]]'>[[item.name]]"
-                        + "</vaadin-grid-tree-toggle>")
+    	EnhancedColumn<T> column = addColumn(LitRenderer.<T> of(
+                "<vaadin-grid-tree-toggle @click=${onClick} .leaf=${!item.children} .expanded=${model.expanded} .level=${model.level}>"
+                        + "${item.name}</vaadin-grid-tree-toggle>")
                 .withProperty("children",
                         item -> getDataCommunicator().hasChildren(item))
                 .withProperty("name",
-                        value -> String.valueOf(valueProvider.apply(value))));
+                        value -> String.valueOf(valueProvider.apply(value)))
+                .withFunction("onClick", item -> {
+                    if (getDataCommunicator().hasChildren(item)) {
+                        if (isExpanded(item)) {
+                            collapse(List.of(item), true);
+                        } else {
+                            expand(List.of(item), true);
+                        }
+                    }
+                }));
+
         final SerializableComparator<T> comparator = (a,
                 b) -> compareMaybeComparables(valueProvider.apply(a),
                         valueProvider.apply(b));
