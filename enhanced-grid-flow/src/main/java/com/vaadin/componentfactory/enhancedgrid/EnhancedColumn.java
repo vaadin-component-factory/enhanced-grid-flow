@@ -298,13 +298,4 @@ public class EnhancedColumn<T> extends Grid.Column<T> {
 	public EnhancedColumn<T> setKey(String key) {
 		return (EnhancedColumn<T>) super.setKey(key);
 	}
-
-	/**
-	 * @see Column#addGridSorter(String)
-	 */
-	@Override
-	public String addGridSorter(String templateInnerHtml) {
-	  templateInnerHtml = Optional.ofNullable(templateInnerHtml).orElse("");
-	  return super.addGridSorter(templateInnerHtml);
-	}
 }
