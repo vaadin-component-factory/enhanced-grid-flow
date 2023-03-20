@@ -44,7 +44,6 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridArrayUpdater;
 import com.vaadin.flow.component.grid.GridArrayUpdater.UpdateQueueData;
 import com.vaadin.flow.component.icon.Icon;
-import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.grid.GridSelectionModel;
 import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
 import com.vaadin.flow.data.provider.DataGenerator;
@@ -422,15 +421,6 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver, App
 	@Override
 	public EnhancedColumn<T> addColumn(Renderer<T> renderer) {
 		return (EnhancedColumn<T>) super.addColumn(renderer);
-	}
-
-	/**
-	 * @see Grid#addColumn(Renderer, String...)
-	 *
-	 */
-	@Override
-	public EnhancedColumn<T> addColumn(Renderer<T> renderer, String... sortingProperties) {
-		return (EnhancedColumn<T>) super.addColumn(renderer, sortingProperties);
 	}
 
 	/**
