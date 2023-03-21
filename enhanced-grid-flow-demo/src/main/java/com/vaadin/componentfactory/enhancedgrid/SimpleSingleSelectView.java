@@ -30,8 +30,7 @@ import com.vaadin.flow.router.RouteAlias;
 public class SimpleSingleSelectView extends Div {
 
     public SimpleSingleSelectView() {
-    	add(new Paragraph("Basic single selection grid example with editing, filtering and sorting"));    	
-    	
+        add(new Paragraph("Basic single selection grid example with editing, filtering and sorting"));
         Div messageDiv = new Div();
 
         List<Person> personList = getItems();

@@ -21,7 +21,6 @@ package com.vaadin.componentfactory.enhancedgrid;
  */
 
 import java.util.Comparator;
-import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -29,12 +28,10 @@ import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.HasValueAndElement;
 import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.dependency.Uses;
-import com.vaadin.flow.component.grid.ColumnPathRenderer;
 import com.vaadin.flow.component.grid.FilterField;
 import com.vaadin.flow.component.grid.FilterFieldDto;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
-import com.vaadin.flow.component.grid.GridSorterFilterComponentRenderer;
 import com.vaadin.flow.component.grid.SortOrderProvider;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Span;
@@ -93,16 +90,16 @@ public class EnhancedColumn<T> extends Grid.Column<T> {
 		}				
 		return setHeader(headerComponent);		
 	}
-		
-	/**
-	 * @see Column#setHeader(Component)
-	 * 
-	 */
+
+	/** @see Column#setHeader(Component) */
 	@Override
 	public EnhancedColumn<T> setHeader(Component headerComponent) {
+		if (this.isFilterable()) {
+			this.grid.getElement().executeJs("monkeyPatchHeaderRenderer(this.$connector, $0)", getInternalId());
+		}
 		return (EnhancedColumn<T>) super.setHeader(headerComponent);
 	}
-	
+
 	/**
 	 * @see Column#setHeader(String)
 	 * 
@@ -160,12 +157,21 @@ public class EnhancedColumn<T> extends Grid.Column<T> {
 		if(headerComponent != null) {
 			headerComponent.getElement().executeJs("return").then(ignore -> {
 				if(hasFilterSelected()) {
-	        		headerComponent.getElement().executeJs("this.parentElement.parentElement._setProperty('filtered', true)");
+					headerComponent.getElement().executeJs("this.parentElement._setProperty('filtered', true);");
 				} else {
-					headerComponent.getElement().executeJs("this.parentElement.parentElement._setProperty('filtered', false);");
+					headerComponent.getElement().executeJs("this.parentElement._setProperty('filtered', false);");
 				}
 	        });
 		}		
+	}
+
+	private void updateFilterIcon() {
+		if (headerComponent != null) {
+			headerComponent.getElement().executeJs("return").then(ignore -> {
+				headerComponent.getElement().executeJs("this.parentElement._setProperty('filtericon', $0);",
+						filterIcon);
+			});
+		}
 	}
 	
 	public ValueProvider<T, ?> getValueProvider(){
@@ -215,8 +221,8 @@ public class EnhancedColumn<T> extends Grid.Column<T> {
 	public EnhancedColumn<T> setSortable(boolean sortable) {
 		return (EnhancedColumn<T>) super.setSortable(sortable);
 	}
-	
-	/**
+
+  /**
 	 * @see Column#setResizable(boolean)
 	 * 
 	 */
@@ -245,7 +251,7 @@ public class EnhancedColumn<T> extends Grid.Column<T> {
 		
 	@Override
 	protected void setHeaderComponent(Component component) {		
-		super.setHeaderRenderer(new GridSorterFilterComponentRenderer<>(this, component));
+	    super.setHeaderComponent(component);
 	}
 	
 	/**
@@ -265,29 +271,10 @@ public class EnhancedColumn<T> extends Grid.Column<T> {
 	public boolean hasFilterSelected() {
 		return filter != null && !filter.isEmpty();
 	}
-			
-	/**
-	 * Add enhanced-grid-sorter element to header template. 
-	 * 
-	 * This element is an extension of vaadin-grid-sorter that also
-	 * adds the filtering button to the header.
-	 * 
-	 * @param templateInnerHtml
-	 * @return
-	 */
-	public String addEnhancedGridSorter(String templateInnerHtml) {
-		String escapedColumnId = HtmlUtils
-                .escape(this.getInternalId());
-		String sortable = isSortable() ? " sortable" : "";
-		String filtered = hasFilterSelected() ? " filtered" : "";
-		boolean addFilterIcon = StringUtils.isNotBlank(filterIcon); 
-		return String.format("<enhanced-grid-sorter" + (addFilterIcon ? " filtericon='" + filterIcon + "'" : "")
-				+ " path='%s'" + sortable + filtered + ">%s</enhanced-grid-sorter>",
-				escapedColumnId, templateInnerHtml);
-	}
 	
 	protected void setFilterIcon(Icon icon) {
 		filterIcon = icon.getElement().getAttribute("icon");
+		updateFilterIcon();
 	}
 	
 	/**
