@@ -1,5 +1,6 @@
 package com.vaadin.componentfactory.enhancedgrid;
 
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
@@ -15,8 +16,11 @@ import com.vaadin.flow.component.grid.GridSortOrderBuilder;
 import com.vaadin.flow.component.grid.editor.Editor;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Paragraph;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.renderer.NumberRenderer;
@@ -29,12 +33,23 @@ import com.vaadin.flow.router.Route;
 public class CustomFilterIconView extends Div {
 
     public CustomFilterIconView() {
-    	add(new Paragraph("Basic single selection grid example with editing, filtering, sorting and a custom filter icon"));    	
-    	
+        EnhancedGrid<Person> grid = new EnhancedGrid<>();
+
+        add(new Paragraph("Basic single selection grid example with editing, filtering, sorting and a custom filter icon"));
+
+        IconInfo customIconSet = new IconInfo("Custom Iconset", EnhancedGridIconsetTest.FILTERICON.create());
+        IconInfo vaadinIcon = new IconInfo("Vaadin icon (airplane)", VaadinIcon.AIRPLANE.create());
+        RadioButtonGroup<IconInfo> icons =
+                new RadioButtonGroup<>("Icons", Arrays.asList(customIconSet, vaadinIcon));
+        icons.setItemLabelGenerator(i -> i.getInfo());
+        icons.addValueChangeListener(e -> {
+            grid.setFilterIcon(e.getValue().getIcon());
+        });
+        add(icons);
+
         Div messageDiv = new Div();
 
         List<Person> personList = getItems();
-        EnhancedGrid<Person> grid = new EnhancedGrid<>();
                 
         // set selection predicate to indicate which items can be selected
         grid.setSelectionPredicate(p -> p.getAge() > 18);
@@ -119,9 +134,8 @@ public class CustomFilterIconView extends Div {
         // add button to clear all sorting
         Button clearSortingButton = new Button("Clear Sorting", e -> grid.sort(null));
         horizontalLayout.add(clearSortingButton);            
-       
-        // set custom filter icon
-        grid.setFilterIcon(EnhancedGridIconsetTest.FILTERICON.create());
+
+        icons.setValue(customIconSet);
         
         add(grid, messageDiv, horizontalLayout);
    
@@ -130,5 +144,31 @@ public class CustomFilterIconView extends Div {
     private List<Person> getItems() {
         PersonService personService = new PersonService();
         return personService.fetchAll();
+    }
+
+    private static class IconInfo {
+        private String info;
+        private Icon icon;
+
+        public IconInfo(String info, Icon icon) {
+              this.info = info;
+              this.icon = icon;
+        }
+
+        public String getInfo() {
+            return info;
+        }
+
+        public void setInfo(String info) {
+            this.info = info;
+        }
+
+        public Icon getIcon() {
+            return icon;
+        }
+
+        public void setIcon(Icon icon) {
+            this.icon = icon;
+        }
     }
 }

@@ -592,8 +592,9 @@ public class EnhancedTreeGrid<T> extends EnhancedGrid<T> implements HasHierarchi
      */
     public <V extends Component> EnhancedColumn<T> addComponentHierarchyColumn(
             ValueProvider<T, V> componentProvider) {
+        TreeGrid<T> discardGrid = new TreeGrid<>();
         return addColumn(new HierarchyColumnComponentRenderer<V, T>(
-                componentProvider).withProperty("children",
+                componentProvider, discardGrid).withProperty("children",
                         item -> getDataCommunicator().hasChildren(item)));
     }
 	
