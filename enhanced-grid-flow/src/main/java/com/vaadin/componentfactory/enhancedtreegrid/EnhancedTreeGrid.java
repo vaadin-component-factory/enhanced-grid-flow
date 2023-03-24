@@ -23,13 +23,9 @@ package com.vaadin.componentfactory.enhancedtreegrid;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -50,7 +46,6 @@ import com.vaadin.flow.component.grid.dataview.GridLazyDataView;
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import com.vaadin.flow.component.treegrid.CollapseEvent;
 import com.vaadin.flow.component.treegrid.ExpandEvent;
-import com.vaadin.flow.component.treegrid.HierarchyColumnComponentRenderer;
 import com.vaadin.flow.component.treegrid.TreeGrid;
 import com.vaadin.flow.component.treegrid.TreeGridArrayUpdater;
 import com.vaadin.flow.data.binder.PropertyDefinition;
@@ -592,9 +587,8 @@ public class EnhancedTreeGrid<T> extends EnhancedGrid<T> implements HasHierarchi
      */
     public <V extends Component> EnhancedColumn<T> addComponentHierarchyColumn(
             ValueProvider<T, V> componentProvider) {
-        TreeGrid<T> discardGrid = new TreeGrid<>();
-        return addColumn(new HierarchyColumnComponentRenderer<V, T>(
-                componentProvider, discardGrid).withProperty("children",
+        return addColumn(new EnhancedHierarchyColumnComponentRenderer<V, T>(
+                componentProvider, this).withProperty("children",
                         item -> getDataCommunicator().hasChildren(item)));
     }
 	
