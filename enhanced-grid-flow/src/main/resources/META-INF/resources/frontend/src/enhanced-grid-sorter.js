@@ -184,16 +184,23 @@ function _patch($connector) {
 
       const sorter = document.createElement('enhanced-grid-sorter');
 
+      sorter.sortable = showSortControls;
       if (showSortControls) {
-        sorter.sortable = showSortControls;
         sorter.path = sorterPath;
         const ariaLabel = content instanceof Node ? content.textContent : content;
         if (ariaLabel) {
             sorter.setAttribute('aria-label', `Sort by ${ariaLabel}`);
         }
+        // all the server side updates will be done by querying for vaadin-grid-sorter
+        // components, so we will add a vaadin-grid-sorter here and copy all changes
+        // done to this element to the parent enhanced-grid-sorter
+        const hack = document.createElement('vaadin-grid-sorter')
+        hack.setAttribute('path', sorterPath);
+        hack.slot = 'direction';
+        hack.style.display = 'none';
+        sorter.append(hack);
       }
       else {
-        sorter.sortable = showSortControls;
         sorter.path = columnData.path;
       }
 
