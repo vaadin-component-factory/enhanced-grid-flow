@@ -544,6 +544,12 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver, App
     protected void onAttach(AttachEvent attachEvent) {
     	super.onAttach(attachEvent);
     	this.updateFilterIcon();
+
+		// Fix missing filter on refresh if @PreserveOnRefresh is used
+		for(Column<T> column : getColumns()) {
+			EnhancedColumn<T> enhancedColumn = (EnhancedColumn<T>)column;
+			Optional.ofNullable(enhancedColumn.getHeaderComponent()).ifPresent(enhancedColumn::setHeader);
+		}
     }
 }
 
