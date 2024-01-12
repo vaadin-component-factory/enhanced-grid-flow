@@ -45,3 +45,7 @@ enhanced-grid-flow/src/main/resources/rebel.xml
 
 enhanced-grid-flow-demo/frontend/generated
 enhanced-grid-flow-demo/src/main/dev-bundle
+enhanced-grid-flow-demo/frontend/index.html
+enhanced-grid-flow-demo/tsconfig.json
+enhanced-grid-flow-demo/types.d.ts
+enhanced-grid-flow-demo/vite.config.ts
