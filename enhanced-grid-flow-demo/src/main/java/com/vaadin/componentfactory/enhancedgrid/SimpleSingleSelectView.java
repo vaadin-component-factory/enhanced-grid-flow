@@ -19,6 +19,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.renderer.NumberRenderer;
+import com.vaadin.flow.router.PreserveOnRefresh;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
 
@@ -27,6 +28,7 @@ import com.vaadin.flow.router.RouteAlias;
  */
 @Route(value = "", layout = MainLayout.class)
 @RouteAlias(value = "single-grid", layout = MainLayout.class)
+@PreserveOnRefresh
 public class SimpleSingleSelectView extends Div {
 
     public SimpleSingleSelectView() {

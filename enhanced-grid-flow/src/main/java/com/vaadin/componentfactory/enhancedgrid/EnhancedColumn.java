@@ -21,8 +21,7 @@ package com.vaadin.componentfactory.enhancedgrid;
  */
 
 import java.util.Comparator;
-
-import org.apache.commons.lang3.StringUtils;
+import java.util.Optional;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.HasValueAndElement;
@@ -38,7 +37,8 @@ import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.data.renderer.Renderer;
 import com.vaadin.flow.function.ValueProvider;
-import com.vaadin.flow.internal.HtmlUtils;
+import com.vaadin.flow.router.BeforeEnterEvent;
+import com.vaadin.flow.router.BeforeEnterObserver;
 
 /**
  * 
@@ -48,7 +48,7 @@ import com.vaadin.flow.internal.HtmlUtils;
  */
 @Uses(Icon.class)
 @JsModule(value = "./src/enhanced-grid-sorter.js")
-public class EnhancedColumn<T> extends Grid.Column<T> {
+public class EnhancedColumn<T> extends Grid.Column<T> implements BeforeEnterObserver {
 
 	private HasValueAndElement<?, ? extends FilterFieldDto> filter;
 	
@@ -284,5 +284,16 @@ public class EnhancedColumn<T> extends Grid.Column<T> {
 	@Override
 	public EnhancedColumn<T> setKey(String key) {
 		return (EnhancedColumn<T>) super.setKey(key);
+	}
+
+	@Override
+	public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
+		if (beforeEnterEvent.isRefreshEvent()) {
+			Optional.ofNullable(this.getHeaderComponent())
+					.ifPresent(headerComponent -> {
+						this.setHeader(headerComponent);
+						this.updateFilterButtonStyle();
+					});
+		}
 	}
 }
