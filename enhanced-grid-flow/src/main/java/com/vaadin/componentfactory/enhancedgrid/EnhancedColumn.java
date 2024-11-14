@@ -32,7 +32,6 @@ import com.vaadin.flow.component.grid.FilterFieldDto;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.grid.SortOrderProvider;
-import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.data.renderer.Renderer;
@@ -76,10 +75,10 @@ public class EnhancedColumn<T> extends Grid.Column<T> implements BeforeEnterObse
 	
 	public EnhancedColumn<T> setHeader(String labelText, HasValueAndElement<?, ? extends FilterFieldDto> filter) {	
 		if(filter != null) {
-			Component headerComponent = new Span();
-	        headerComponent.getElement().setText(labelText);
-	        addFilterButtonToHeader(headerComponent, filter);		
-	        return setHeader(headerComponent); 
+			Component component = new Span();
+	        component.getElement().setText(labelText);
+	        addFilterButtonToHeader(component, filter);
+	        return setHeader(component);
 		}		
 		return setHeader(labelText);
     }
@@ -109,41 +108,36 @@ public class EnhancedColumn<T> extends Grid.Column<T> implements BeforeEnterObse
 		return (EnhancedColumn<T>) super.setHeader(labelText);
 	}
 	
-	private void addFilterButtonToHeader(Component headerComponent, HasValueAndElement<?, ? extends FilterFieldDto> filter) {
+	protected void addFilterButtonToHeader(Component headerComponent, HasValueAndElement<?, ? extends FilterFieldDto> filter) {
 		this.filter = filter;
 		this.headerComponent = headerComponent;
                 
         // add filter field (popup component) and set filter as it's filter component
         filterField = new FilterField();
         filterField.addApplyFilterListener(grid);
-        filterField.addFilterComponent(filter.getElement().getComponent().get());
-        
-        filterField.addPopupOpenChangedEventListener(e -> {
+		filter.getElement().getComponent()
+		      .ifPresent(filterComponent -> filterField.addFilterComponent(filterComponent));
+
+        filterField.addOpenedChangeListener(e -> {
            	if(grid.getEditor().getItem() != null) {
            		if(grid.allowCancelEditDialogDisplay()) {
-           			grid.cancelEditWithCancelCallback(() -> filterField.hide());
+           			grid.cancelEditWithCancelCallback(() -> filterField.close());
            		} else {
            			grid.getEditor().cancel();
            		}
            	}  	
         });
         
-        // need to add a not visible component so filterField (popup component) can be open
-        Div div = new Div();
-        div.setId(getInternalId());       
-        div.getElement().getStyle().set("display", "inline-block");
-		filterField.setFor(div.getId().get());		
-		headerComponent.getElement().appendChild(div.getElement());
-
 		// add filter field to header
        	headerComponent.getElement().appendChild(filterField.getElement());
-                
+		filterField.setTarget(headerComponent);
+
         grid.addFilterClickedEventListener(e -> {
            	if(e.buttonId.equals(getInternalId())) {
         		if(filterField.isOpened()) {
-        			filterField.hide();
+        			filterField.close();
         		} else {
-        			filterField.show();
+        			filterField.open();
         		}
         	}
 		});
@@ -153,7 +147,7 @@ public class EnhancedColumn<T> extends Grid.Column<T> implements BeforeEnterObse
 		return filter; 
 	}	
 	
-	void updateFilterButtonStyle(){
+	protected void updateFilterButtonStyle(){
 		if(headerComponent != null) {
 			headerComponent.getElement().executeJs("return").then(ignore -> {
 				if(hasFilterSelected()) {
