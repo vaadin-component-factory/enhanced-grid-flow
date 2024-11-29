@@ -89,17 +89,12 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver, App
     
     private Icon filterIcon;
     	
-    SerializableFunction<T, String> selectionDisabled = new SerializableFunction<T, String>() {
-
-    	@Override
-		public String apply(T item) {
-			if(!selectionPredicate.test(item)) {
-    			return "selection-disabled";
-    		}
-			return "";
-		}
-    	
-	};
+    SerializableFunction<T, String> selectionDisabled = item -> {
+        if (!selectionPredicate.test(item)) {
+            return "selection-disabled";
+        }
+        return "";
+    };
 
     private SerializableFunction<T, String> defaultClassNameGenerator = item -> null;
 
@@ -229,6 +224,16 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver, App
             GridSelectionModel<T> model = new CustomAbstractGridMultiSelectionModel<T>(this) {
 
                 @Override
+                public void setDragSelect(boolean b) {
+					// Do nothing
+                }
+
+                @Override
+                public boolean isDragSelect() {
+                    return false;
+                }
+
+                @Override
                 protected void fireSelectionEvent(SelectionEvent<Grid<T>, T> event) {
                     ComponentUtil.fireEvent(getGrid(), (ComponentEvent<Grid<?>>) event);
                 }
@@ -289,11 +294,11 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver, App
     	}
 
         T onEditItem = this.getEditor().getItem();    	    	
-    	if(onEditItem != null && item.equals(onEditItem)) {
+    	if(item.equals(onEditItem)) {
     		return;
     	}
     	
-		if(onEditItem != null && !item.equals(onEditItem) && allowCancelEditDialogDisplay()) {
+		if(onEditItem != null && allowCancelEditDialogDisplay()) {
 			cancelEditItem(item, null, null);
 		} else {
 			this.getEditor().editItem(item);
@@ -328,7 +333,13 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver, App
 			}
     	}      
     }
-    
+
+	/**
+	 * Cancel the edition of the item.
+	 * @param newEditItem - the new item to edit
+	 * @param action - the action to proceed
+	 * @param onCancelCallback - the callback to execute on cancel action
+	 */
     protected void cancelEditItem(T newEditItem, ContinueNavigationAction action, SerializableRunnable onCancelCallback) {
     	String text = getTranslation(CANCEL_EDIT_MSG_KEY);
     	String confirmText = getTranslation(CANCEL_EDIT_CONFIRM_BTN_KEY); 
@@ -337,14 +348,24 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver, App
        	new CancelEditConfirmDialog(text, confirmText, cancelText, onConfirmCallback, onCancelCallback).open();
     }
 
-    private void onConfirmEditItem(T newEditItem) {
+	/**
+	 * Confirm the edition of the item.
+	 * @param newEditItem - the new item to edit
+	 */
+    protected void onConfirmEditItem(T newEditItem) {
     	this.getEditor().cancel();
 		if(newEditItem != null) {
 			this.getEditor().editItem(newEditItem);
 		}
     }
 
-    private void onConfirmEditItem(T newEditItem, ContinueNavigationAction action) {
+	/**
+	 * Confirm the edition of the item.
+	 *
+	 * @param newEditItem - the new item to edit
+	 * @param action - the action to proceed
+	 */
+	protected void onConfirmEditItem(T newEditItem, ContinueNavigationAction action) {
     	this.onConfirmEditItem(null);
     	action.proceed();
     }
@@ -352,7 +373,7 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver, App
 	/**
 	 * Set showCancelEditDialog value to know if {@link CancelEditConfirmDialog} should be displayed.
 	 *
-	 * @param showCancelEditDialog
+	 * @param showCancelEditDialog - the value to set
 	 */
 	public void setShowCancelEditDialog(boolean showCancelEditDialog) {
 		this.showCancelEditDialog = showCancelEditDialog;
