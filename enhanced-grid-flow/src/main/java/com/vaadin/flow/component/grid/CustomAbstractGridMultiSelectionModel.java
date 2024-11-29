@@ -65,7 +65,7 @@ public abstract class CustomAbstractGridMultiSelectionModel<T>
      *            reference to the grid for which this selection model is
      *            created
      */
-    public CustomAbstractGridMultiSelectionModel(Grid<T> grid) {
+    protected CustomAbstractGridMultiSelectionModel(Grid<T> grid) {
         super(grid);
         selected = new LinkedHashSet<>();
         selectionColumn = new CustomGridSelectionColumn(this::clientSelectAll,

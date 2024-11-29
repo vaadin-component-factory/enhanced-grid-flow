@@ -22,7 +22,6 @@ import java.util.Optional;
  * #L%
  */
 
-import com.vaadin.componentfactory.Popup;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.HasValue;
 import com.vaadin.flow.component.button.Button;
@@ -31,8 +30,9 @@ import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.popover.Popover;
 
-public class FilterField extends Popup {
+public class FilterField extends Popover {
 	
 	private static final String APPLY_BTN_KEY = "filter-field.apply.btn";
 	
@@ -55,6 +55,14 @@ public class FilterField extends Popup {
 		rootLayout.add(filterComponentDiv, createButtonsLayout());
 		add(rootLayout);
 		getElement().getThemeList().add("enhanced-grid-filter-field");
+
+		setOpenOnClick(false);
+		setOpenOnFocus(true);
+		setOpenOnHover(false);
+
+		setCloseOnOutsideClick(true);
+		setCloseOnEsc(true);
+		setAutofocus(true);
 	}
 		
 	private HorizontalLayout createButtonsLayout() {
@@ -71,7 +79,7 @@ public class FilterField extends Popup {
 
 	public void applyFilter() {
 		applyFilterListener.onApplyFilter(((HasValue<?,?>)filterComponent).getValue());		
-		this.hide();
+		this.close();
 	}
 
 	public void resetFilter() {
