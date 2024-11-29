@@ -20,7 +20,7 @@ package com.vaadin.flow.component.grid;
  * #L%
  */
 
-import jakarta.validation.constraints.NotNull;
+import jakarta.annotation.Nonnull;
 
 import com.vaadin.componentfactory.enhancedgrid.EnhancedGrid;
 import com.vaadin.flow.component.ComponentEvent;
@@ -34,10 +34,9 @@ import com.vaadin.flow.component.EventData;
 @DomEvent("filter-clicked")
 public class FilterClickedEvent<T> extends ComponentEvent<EnhancedGrid<T>> {
 
-	@NotNull
 	public final String buttonId;
 	
-	public FilterClickedEvent(EnhancedGrid<T> source, boolean fromClient, @EventData("event.detail.id") @NotNull String id) {
+	public FilterClickedEvent(EnhancedGrid<T> source, boolean fromClient, @EventData("event.detail.id") @Nonnull String id) {
 		super(source, fromClient);
 		this.buttonId = id;
 	}
