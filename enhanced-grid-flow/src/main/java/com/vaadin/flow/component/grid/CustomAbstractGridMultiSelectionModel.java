@@ -2,9 +2,9 @@ package com.vaadin.flow.component.grid;
 
 /*-
  * #%L
- * Custom Grid
+ * Enhanced Grid
  * %%
- * Copyright (C) 2020 - 2021 Vaadin Ltd
+ * Copyright (C) 2020 - 2024 Vaadin Ltd
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
