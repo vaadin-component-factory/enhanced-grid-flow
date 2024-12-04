@@ -6,7 +6,7 @@
 
     <groupId>com.vaadin.componentfactory</groupId>
     <artifactId>enhanced-grid-flow-demo</artifactId>
-    <version>5.0.0</version>
+    <version>5.0.1-SNAPSHOT</version>
 
     <name>Enhanced Grid Demo</name>
     <packaging>war</packaging>
