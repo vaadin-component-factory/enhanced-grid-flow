@@ -49,3 +49,4 @@ enhanced-grid-flow-demo/frontend/index.html
 enhanced-grid-flow-demo/tsconfig.json
 enhanced-grid-flow-demo/types.d.ts
 enhanced-grid-flow-demo/vite.config.ts
+enhanced-grid-flow-demo/src/main/bundles
