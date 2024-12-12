@@ -22,7 +22,6 @@ package com.vaadin.componentfactory.enhancedgrid;
 
 import java.util.Comparator;
 import java.util.Optional;
-
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.HasValueAndElement;
 import com.vaadin.flow.component.dependency.JsModule;
@@ -91,14 +90,19 @@ public class EnhancedColumn<T> extends Grid.Column<T> implements BeforeEnterObse
 	}
 
 	/** @see Column#setHeader(Component) */
-	@Override
-	public EnhancedColumn<T> setHeader(Component headerComponent) {
-		if (this.isFilterable()) {
-			this.grid.getElement().executeJs("monkeyPatchHeaderRenderer(this.$connector, $0)", getInternalId());
-		}
-		return (EnhancedColumn<T>) super.setHeader(headerComponent);
-	}
+    @Override
+    public EnhancedColumn<T> setHeader(Component headerComponent) {
+      this.renderHeader();
+      return (EnhancedColumn<T>) super.setHeader(headerComponent);
+    }
 
+    protected void renderHeader() {
+      if (this.isFilterable()) {
+        this.grid.getElement().executeJs("monkeyPatchHeaderRenderer(this.$connector, $0)",
+            getInternalId());
+      }
+    }
+	
 	/**
 	 * @see Column#setHeader(String)
 	 * 

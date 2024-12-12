@@ -18,10 +18,11 @@ public class MainLayout extends AppLayout {
         final RouterLink multiTree = new RouterLink("Multiple Selection Tree Grid", MultiTreeGridView.class);
         final RouterLink lazySingleTree = new RouterLink("Lazy Single Selection Tree Grid", LazySingleTreeGridView.class);        
         final RouterLink lazyMultiTree = new RouterLink("Lazy Multiple Selection Tree Grid", LazyMultiTreeGridView.class);   
-        final RouterLink customFilterIcon = new RouterLink("Custom filter icon grid", CustomFilterIconView.class);   
+        final RouterLink customFilterIcon = new RouterLink("Custom filter icon grid", CustomFilterIconView.class);
+        final RouterLink gridInDialog = new RouterLink("Open Grid in Dialog", GridInDialogView.class);
                 
         final VerticalLayout menuLayout = new VerticalLayout(simpleSingleGrid, simpleMultiGrid, lazySingleGrid, lazyMultiGrid, 
-        		singleTree, multiTree, lazySingleTree, lazyMultiTree, customFilterIcon);
+        		singleTree, multiTree, lazySingleTree, lazyMultiTree, customFilterIcon, gridInDialog);
         addToDrawer(menuLayout);
         addToNavbar(drawerToggle);
     }
