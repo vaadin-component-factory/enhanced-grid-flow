@@ -1,20 +1,4 @@
-# 
-
-
-## Development instructions
-
-Build the project and install the add-on locally:
-```
-mvn clean install
-```
-Starting the demo server:
-
-Go to enhanced-grid-flow-demo and run:
-```
-mvn jetty:run
-```
-
-This deploys demo at http://localhost:8080
+# Enhanced Grid for Vaadin Flow
 
 ## Description 
 
@@ -31,10 +15,24 @@ This component is an extended version of Grid that provides support to the follo
 - pre-selection of filters to apply for each column
 - pre-selection of sorting direction for each column
 
+## Development instructions
+
+Build the project and install the add-on locally:
+```
+mvn clean install
+```
+Starting the demo server:
+
+Go to enhanced-grid-flow-demo and run:
+```
+mvn jetty:run
+```
+
+This deploys demo at http://localhost:8080
+
 ## How to use it
 
 Create a new component EnhancedGrid/EnhancedTreeGrid and use it like a Grid/TreeGrid.
-
 
 ## Examples
 
@@ -101,8 +99,15 @@ com.vaadin.componentfactory.enhancedgrid.LazyMultiTreeGridView
 
 ## Demo
 
-You can check the demo here: https://incubator.app.fi/enhanced-grid-flow-demo/
+You can check the demo here: https://vcf-demos.org/enhanced-grid/
 
 ## Missing features or bugs
 
 You can report any issue or missing feature on github: https://github.com/vaadin-component-factory/enhanced-grid-flow
+
+## License
+Distributed under Apache Licence 2.0. 
+
+### Sponsored development
+Major pieces of development of this add-on has been sponsored by multiple customers of Vaadin. Read more about Expert on Demand at: [Support](https://vaadin.com/support) and [Pricing](https://vaadin.com/pricing).
+
