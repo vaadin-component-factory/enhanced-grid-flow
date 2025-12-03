@@ -4,7 +4,7 @@ package com.vaadin.flow.component.grid;
  * #%L
  * Enhanced Grid
  * %%
- * Copyright (C) 2020 - 2024 Vaadin Ltd
+ * Copyright (C) 2020 - 2025 Vaadin Ltd
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,10 +22,25 @@ package com.vaadin.flow.component.grid;
 
 import java.util.function.Predicate;
 
+/**
+ * Interface for a filter field dto.
+ * 
+ * @param <T> type of the filter field dto
+ */
 public interface FilterFieldDto<T> {
 
+	/**
+	 * Returns the filter predicate.
+	 * 
+	 * @return the filter predicate
+	 */
 	Predicate<T> getFilterPredicate();
-	
+
+	/**
+	 * Returns true if the filter field is empty.
+	 * 
+	 * @return true if the filter field is empty
+	 */
 	boolean isEmpty();
-	
+
 }

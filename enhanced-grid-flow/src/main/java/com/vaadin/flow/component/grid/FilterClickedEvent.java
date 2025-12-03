@@ -4,7 +4,7 @@ package com.vaadin.flow.component.grid;
  * #%L
  * Enhanced Grid
  * %%
- * Copyright (C) 2020 - 2024 Vaadin Ltd
+ * Copyright (C) 2020 - 2025 Vaadin Ltd
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,9 @@ import com.vaadin.flow.component.EventData;
 
 /**
  * Custom event triggered by enhanced-grid-sorter element.
+ * 
+ * @param <T>
+ *            type of the underlying grid the filter is compatible with
  * 
  */
 @DomEvent("filter-clicked")

@@ -4,7 +4,7 @@ package com.vaadin.flow.component.grid;
  * #%L
  * Enhanced Grid
  * %%
- * Copyright (C) 2020 - 2024 Vaadin Ltd
+ * Copyright (C) 2020 - 2025 Vaadin Ltd
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,16 @@ package com.vaadin.flow.component.grid;
  * #L%
  */
 
+/**
+ * Interface for listening to apply filter events.
+ */
 public interface ApplyFilterListener {
 
+	/**
+	 * Called when the apply filter event is fired.
+	 * 
+	 * @param filter
+	 *               the filter to apply
+	 */
 	void onApplyFilter(Object filter);
 }
