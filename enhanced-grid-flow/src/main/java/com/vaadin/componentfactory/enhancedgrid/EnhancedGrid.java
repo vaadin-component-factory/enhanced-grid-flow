@@ -4,7 +4,7 @@ package com.vaadin.componentfactory.enhancedgrid;
  * #%L
  * enhanced-grid-flow
  * %%
- * Copyright (C) 2020 - 2024 Vaadin Ltd
+ * Copyright (C) 2020 - 2025 Vaadin Ltd
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ package com.vaadin.componentfactory.enhancedgrid;
  */
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -35,6 +36,7 @@ import com.vaadin.flow.component.ComponentUtil;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.grid.ApplyFilterListener;
 import com.vaadin.flow.component.grid.CancelEditConfirmDialog;
+import com.vaadin.flow.component.grid.ClientItemToggleEvent;
 import com.vaadin.flow.component.grid.CustomAbstractGridMultiSelectionModel;
 import com.vaadin.flow.component.grid.CustomAbstractGridSingleSelectionModel;
 import com.vaadin.flow.component.grid.Filter;
@@ -42,16 +44,17 @@ import com.vaadin.flow.component.grid.FilterClickedEvent;
 import com.vaadin.flow.component.grid.FilterField;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridArrayUpdater;
-import com.vaadin.flow.component.grid.GridArrayUpdater.UpdateQueueData;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.grid.GridSelectionModel;
+import com.vaadin.flow.data.provider.BackEndDataProvider;
 import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
+import com.vaadin.flow.data.provider.DataCommunicator;
 import com.vaadin.flow.data.provider.DataGenerator;
 import com.vaadin.flow.data.provider.DataProvider;
+import com.vaadin.flow.data.provider.InMemoryDataProvider;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.renderer.Renderer;
 import com.vaadin.flow.data.selection.SelectionEvent;
-import com.vaadin.flow.function.SerializableBiFunction;
 import com.vaadin.flow.function.SerializableFunction;
 import com.vaadin.flow.function.SerializablePredicate;
 import com.vaadin.flow.function.SerializableRunnable;
@@ -61,14 +64,14 @@ import com.vaadin.flow.router.BeforeLeaveEvent.ContinueNavigationAction;
 import com.vaadin.flow.router.BeforeLeaveObserver;
 import com.vaadin.flow.shared.Registration;
 
-import elemental.json.JsonObject;
 import org.apache.commons.lang3.StringUtils;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Add a selectionPredicate to forbid the grid selection for specific rows
  * Add a editablePredicate to forbid the edition for specific rows
  *
- * @param <T>
+ * @param <T> the grid bean type
  */
 @CssImport(value = "./styles/enhanced-grid-selection-disabled.css", themeFor = "vaadin-grid")
 public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver, ApplyFilterListener {
@@ -96,13 +99,71 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver, App
         return "";
     };
 
-    private SerializableFunction<T, String> defaultClassNameGenerator = item -> null;
+    private SerializableFunction<T, String> defaultPartNameGenerator = item -> null;
 
     /**
+     * Creates a new instance.
+     * 
      * @see Grid#Grid()
      */
     public EnhancedGrid() {
         super();
+    }
+
+    /**
+     * Creates a new grid using the given generic {@link DataProvider}.
+     * 
+     * @see Grid#Grid(DataProvider)
+     *
+     * @param dataProvider
+     *                     the data provider, not {@code null}
+     */
+    public EnhancedGrid(DataProvider<T, Void> dataProvider) {
+        super(dataProvider);
+    }
+
+    /**
+     * @see Grid#Grid(BackEndDataProvider)
+     *
+     * @param dataProvider
+     *                     the data provider, not {@code null}
+     *
+     */
+    public EnhancedGrid(BackEndDataProvider<T, Void> dataProvider) {
+        super(dataProvider);
+    }
+
+    /**
+     * @see Grid#Grid(InMemoryDataProvider)
+     *
+     * @param inMemoryDataProvider
+     *                             the data provider, not {@code null}
+     *
+     */
+    public EnhancedGrid(InMemoryDataProvider<T> inMemoryDataProvider) {
+        super(inMemoryDataProvider);
+    }
+
+    /**
+     * @see Grid#Grid(ListDataProvider)
+     *
+     * @param dataProvider
+     *                     the data provider, not {@code null}
+     *
+     */
+    public EnhancedGrid(ListDataProvider<T> dataProvider) {
+        super(dataProvider);
+    }
+
+    /**
+     * @see Grid#Grid(Collection)
+     *
+     * @param items
+     *              the collection of items, not {@code null}
+     *
+     */
+    public EnhancedGrid(Collection<T> items) {
+        super(items);
     }
 
     /**
@@ -119,8 +180,9 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver, App
      *
      * @see Grid#Grid(Class, boolean)
      *
-     * @param beanType - the bean type to use, not null
-     * @param autoCreateColumns – when true, columns are created automatically for the properties of the beanType
+     * @param beanType          - the bean type to use, not null
+     * @param autoCreateColumns – when true, columns are created automatically for
+     *                          the properties of the beanType
      */
     public EnhancedGrid(Class<T> beanType, boolean autoCreateColumns) {
         super(beanType, autoCreateColumns);
@@ -135,87 +197,118 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver, App
     public EnhancedGrid(Class<T> beanType) {
         super(beanType);
     }
-    
+
     /**
      * 
-     * @see Grid#Grid(Class, SerializableBiFunction, DataCommunicatorBuilder)
+     * @see Grid#Grid(Class, DataCommunicatorBuilder)
      * 
-     * @param <U>
-     * @param <B>
      * @param beanType
-     * @param updateQueueBuilder
+     *                                the bean type to use, not <code>null</code>
      * @param dataCommunicatorBuilder
+     *                                Builder for {@link DataCommunicator}
+     *                                implementation this Grid
+     *                                uses to handle all data communication.
+     * @param <B>
+     *                                the data communicator builder type
+     * @param <U>
+     *                                the GridArrayUpdater type
      */
     protected <U extends GridArrayUpdater, B extends DataCommunicatorBuilder<T, U>> EnhancedGrid(
-            Class<T> beanType,
-            SerializableBiFunction<UpdateQueueData, Integer, UpdateQueue> updateQueueBuilder,
-            B dataCommunicatorBuilder){
-    	super(beanType, updateQueueBuilder, dataCommunicatorBuilder);
+            Class<T> beanType, B dataCommunicatorBuilder) {
+        super(beanType, dataCommunicatorBuilder);
     }
-    
+
+    /**
+     * @see Grid#Grid(Class, DataCommunicatorBuilder, boolean)
+     *
+     * @param beanType
+     *                                the bean type to use, not <code>null</code>
+     * @param dataCommunicatorBuilder
+     *                                Builder for {@link DataCommunicator}
+     *                                implementation this Grid
+     *                                uses to handle all data communication.
+     * @param <B>
+     *                                the data communicator builder type
+     * @param <U>
+     *                                the GridArrayUpdater type
+     * @param autoCreateColumns
+     *                                when <code>true</code>, columns are created
+     *                                automatically for
+     *                                the properties of the beanType
+     */
+    protected <U extends GridArrayUpdater, B extends DataCommunicatorBuilder<T, U>> EnhancedGrid(
+            Class<T> beanType, B dataCommunicatorBuilder,
+            boolean autoCreateColumns) {
+        super(beanType, dataCommunicatorBuilder, autoCreateColumns);
+    }
+
     /**
      * 
-     * @see Grid#Grid(int, SerializableBiFunction, DataCommunicatorBuilder)
+     * @see Grid#Grid(int, DataCommunicatorBuilder)
      * 
-     * @param <U>
-     * @param <B>
      * @param pageSize
-     * @param updateQueueBuilder
+     *                                the page size. Must be greater than zero.
      * @param dataCommunicatorBuilder
+     *                                Builder for {@link DataCommunicator}
+     *                                implementation this Grid
+     *                                uses to handle all data communication.
+     * @param <B>
+     *                                the data communicator builder type
+     * @param <U>
+     *                                the GridArrayUpdater type
      */
     protected <U extends GridArrayUpdater, B extends DataCommunicatorBuilder<T, U>> EnhancedGrid(
-            int pageSize,
-            SerializableBiFunction<UpdateQueueData, Integer, UpdateQueue> updateQueueBuilder,
-            B dataCommunicatorBuilder) {
-    	super(pageSize, updateQueueBuilder, dataCommunicatorBuilder);
+            int pageSize, B dataCommunicatorBuilder) {
+        super(pageSize, dataCommunicatorBuilder);
     }
-        
+
     /**
      * Define if an item can be selected.
      * 
-     * @return
+     * @return the selectionPredicate
      */
     public SerializablePredicate<T> getSelectionPredicate() {
         return selectionPredicate;
     }
 
     /**
-     * Disable selection/deselection of the item that doesn't match the selectionPredicate
+     * Disable selection/deselection of the item that doesn't match the
+     * selectionPredicate
      *
      * @param selectionPredicate selectionPredicate
      */
     public void setSelectionPredicate(SerializablePredicate<T> selectionPredicate) {
         this.selectionPredicate = selectionPredicate;
         if (generateSelectionGenerator != null) {
-          generateSelectionGenerator.destroyAllData();
+            generateSelectionGenerator.destroyAllData();
         }
         generateSelectionGenerator = this::generateSelectionAccess;
         addDataGenerator(generateSelectionGenerator);
 
-        setClassNameGenerator(defaultClassNameGenerator);
+        setPartNameGenerator(defaultPartNameGenerator);
     }
 
-	@Override
-	public void setClassNameGenerator(SerializableFunction<T, String> classNameGenerator) {
-	    defaultClassNameGenerator = classNameGenerator;
-		super.setClassNameGenerator(item -> {
-          String className = Optional.ofNullable(defaultClassNameGenerator.apply(item)).orElse("");
-          return StringUtils.trimToNull(selectionDisabled.apply(item) + " " + className);
-		});
-	}
+    @Override
+    public void setPartNameGenerator(SerializableFunction<T, String> partNameGenerator) {
+        defaultPartNameGenerator = partNameGenerator;
+        super.setPartNameGenerator(item -> {
+            String className = Optional.ofNullable(defaultPartNameGenerator.apply(item)).orElse("");
+            return StringUtils.trimToNull(selectionDisabled.apply(item) + " " + className);
+        });
+    }
 
     /**
      * Add a selectionDisabled value on the client side
      *
-     * @param item item
+     * @param item       item
      * @param jsonObject jsonObject
      */
-    private void generateSelectionAccess(T item, JsonObject jsonObject) {
+    private void generateSelectionAccess(T item, ObjectNode jsonObject) {
         if (!selectionPredicate.test(item)) {
             jsonObject.put("selectionDisabled", true);
         }
     }
-    
+
     @Override
     public GridSelectionModel<T> setSelectionMode(SelectionMode selectionMode) {
         if (selectionMode == SelectionMode.MULTI) {
@@ -237,10 +330,17 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver, App
                 protected void fireSelectionEvent(SelectionEvent<Grid<T>, T> event) {
                     ComponentUtil.fireEvent(getGrid(), (ComponentEvent<Grid<?>>) event);
                 }
+
+                @Override
+                public Registration addClientItemToggleListener(
+                        ComponentEventListener<ClientItemToggleEvent<T>> listener) {
+                    // TODO Auto-generated method stub
+                    return null;
+                }
             };
             setSelectionModel(model, selectionMode);
             return model;
-        } else  if (selectionMode == SelectionMode.SINGLE) {
+        } else if (selectionMode == SelectionMode.SINGLE) {
             GridSelectionModel<T> model = new CustomAbstractGridSingleSelectionModel<T>(this) {
 
                 @Override
@@ -252,8 +352,8 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver, App
                 public void setDeselectAllowed(boolean deselectAllowed) {
                     super.setDeselectAllowed(deselectAllowed);
                     getGrid().getElement().executeJs(
-                        "this.$connector.deselectAllowed = $0",
-                        deselectAllowed);
+                            "this.$connector.deselectAllowed = $0",
+                            deselectAllowed);
                 }
             };
             setSelectionModel(model, selectionMode);
@@ -267,7 +367,7 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver, App
     /**
      * Define if an item can be edited.
      *
-     * @param editablePredicate
+     * @param editablePredicate the editablePredicate to set
      */
     public void setEditablePredicate(SerializablePredicate<T> editablePredicate) {
         this.editablePredicate = editablePredicate;
@@ -276,17 +376,17 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver, App
     /**
      * Return whether an item is editable or not.
      *
-     * @param item
-     * @return
+     * @param item the item to test
+     * @return true if the item is editable, false otherwise
      */
     public boolean isEditable(T item) {
-    	return this.editablePredicate.test(item);
+        return this.editablePredicate.test(item);
     }
 
     /**
      * Edit the selected item.
      *
-     * @param item
+     * @param item the item to edit
      */
     public void editItem(T item) {
         if(!isEditable(item)) {
@@ -307,7 +407,6 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver, App
 
     /**
      * Cancel the current item edition.
-     *
      */
     public void cancelEdit() {
     	if(this.getEditor().getItem() != null) {
@@ -322,7 +421,7 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver, App
     /**
      * Cancel the current item edition with an specific callback for cancel action. 
      * 
-     * @param onCancelCallback
+     * @param onCancelCallback the callback to execute when canceling the edition
      */
     protected void cancelEditWithCancelCallback(SerializableRunnable onCancelCallback) {
     	if(this.getEditor().getItem() != null) {
@@ -334,78 +433,85 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver, App
     	}      
     }
 
-	/**
-	 * Cancel the edition of the item.
-	 * @param newEditItem - the new item to edit
-	 * @param action - the action to proceed
-	 * @param onCancelCallback - the callback to execute on cancel action
-	 */
-    protected void cancelEditItem(T newEditItem, ContinueNavigationAction action, SerializableRunnable onCancelCallback) {
-    	String text = getTranslation(CANCEL_EDIT_MSG_KEY);
-    	String confirmText = getTranslation(CANCEL_EDIT_CONFIRM_BTN_KEY); 
-    	String cancelText = getTranslation(CANCEL_EDIT_CANCEL_BTN_KEY);
-       	SerializableRunnable onConfirmCallback = action != null ? () -> this.onConfirmEditItem(newEditItem, action) : () -> this.onConfirmEditItem(newEditItem);
-       	new CancelEditConfirmDialog(text, confirmText, cancelText, onConfirmCallback, onCancelCallback).open();
+    /**
+     * Cancel the edition of the item.
+     * 
+     * @param newEditItem      the new item to edit
+     * @param action           the action to proceed
+     * @param onCancelCallback the callback to execute on cancel action
+     */
+    protected void cancelEditItem(T newEditItem, ContinueNavigationAction action,
+            SerializableRunnable onCancelCallback) {
+        String text = getTranslation(CANCEL_EDIT_MSG_KEY);
+        String confirmText = getTranslation(CANCEL_EDIT_CONFIRM_BTN_KEY);
+        String cancelText = getTranslation(CANCEL_EDIT_CANCEL_BTN_KEY);
+        SerializableRunnable onConfirmCallback = action != null ? () -> this.onConfirmEditItem(newEditItem, action)
+                : () -> this.onConfirmEditItem(newEditItem);
+        new CancelEditConfirmDialog(text, confirmText, cancelText, onConfirmCallback, onCancelCallback).open();
     }
 
-	/**
-	 * Confirm the edition of the item.
-	 * @param newEditItem - the new item to edit
-	 */
+    /**
+     * Confirm the edition of the item.
+     * 
+     * @param newEditItem the new item to edit
+     */
     protected void onConfirmEditItem(T newEditItem) {
-    	this.getEditor().cancel();
-		if(newEditItem != null) {
-			this.getEditor().editItem(newEditItem);
-		}
+        this.getEditor().cancel();
+        if (newEditItem != null) {
+            this.getEditor().editItem(newEditItem);
+        }
     }
 
-	/**
-	 * Confirm the edition of the item.
-	 *
-	 * @param newEditItem - the new item to edit
-	 * @param action - the action to proceed
-	 */
-	protected void onConfirmEditItem(T newEditItem, ContinueNavigationAction action) {
-    	this.onConfirmEditItem(null);
-    	action.proceed();
+    /**
+     * Confirm the edition of the item.
+     *
+     * @param newEditItem the new item to edit
+     * @param action      the action to proceed
+     */
+    protected void onConfirmEditItem(T newEditItem, ContinueNavigationAction action) {
+        this.onConfirmEditItem(null);
+        action.proceed();
     }
 
-	/**
-	 * Set showCancelEditDialog value to know if {@link CancelEditConfirmDialog} should be displayed.
-	 *
-	 * @param showCancelEditDialog - the value to set
-	 */
-	public void setShowCancelEditDialog(boolean showCancelEditDialog) {
-		this.showCancelEditDialog = showCancelEditDialog;
-	}
+    /**
+     * Set showCancelEditDialog value to know if {@link CancelEditConfirmDialog}
+     * should be displayed.
+     *
+     * @param showCancelEditDialog the value to set
+     */
+    public void setShowCancelEditDialog(boolean showCancelEditDialog) {
+        this.showCancelEditDialog = showCancelEditDialog;
+    }
 
-	/**
-	 * {@link CancelEditConfirmDialog} will be displayed if showCancelEditDialog
-	 * is true and editor is in buffered mode.
-	 *
-	 * @return
-	 */
-	protected boolean allowCancelEditDialogDisplay() {
-		return showCancelEditDialog && this.getEditor().isBuffered();
-	}
+    /**
+     * {@link CancelEditConfirmDialog} will be displayed if showCancelEditDialog
+     * is true and editor is in buffered mode.
+     *
+     * @return true if {@link CancelEditConfirmDialog} should be displayed
+     */
+    protected boolean allowCancelEditDialogDisplay() {
+        return showCancelEditDialog && this.getEditor().isBuffered();
+    }
 
-	@Override
-	public void beforeLeave(BeforeLeaveEvent event) {
-		T onEditItem = this.getEditor().getItem();
-		if(onEditItem != null && allowCancelEditDialogDisplay()) {
-			ContinueNavigationAction action = event.postpone();
-			cancelEditItem(null, action, null);
-		}
-	}
+    @Override
+    public void beforeLeave(BeforeLeaveEvent event) {
+        T onEditItem = this.getEditor().getItem();
+        if (onEditItem != null && allowCancelEditDialogDisplay()) {
+            ContinueNavigationAction action = event.postpone();
+            cancelEditItem(null, action, null);
+        }
+    }
 
-	/**
-	 * @see Grid#getDefaultColumnFactory()
-	 *
-	 */
-	@Override
-	protected BiFunction<Renderer<T>, String, Column<T>> getDefaultColumnFactory() {
-		return (renderer, columnId) -> new EnhancedColumn<>(this, columnId, renderer);
-	}
+    /**
+     * Return the default column factory.
+     * 
+     * @see Grid#getDefaultColumnFactory()
+     *
+     */
+    @Override
+    protected BiFunction<Renderer<T>, String, Column<T>> getDefaultColumnFactory() {
+        return (renderer, columnId) -> new EnhancedColumn<>(this, columnId, renderer);
+    }
 
 	/**
 	 * @see Grid#addColumn(ValueProvider)

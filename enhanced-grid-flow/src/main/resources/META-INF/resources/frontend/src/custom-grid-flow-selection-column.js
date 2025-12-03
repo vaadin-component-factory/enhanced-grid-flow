@@ -20,6 +20,8 @@
 
 import '@vaadin/grid/vaadin-grid-column.js';
 import { GridColumn } from '@vaadin/grid/src/vaadin-grid-column.js';
+import { defineCustomElement } from '@vaadin/component-base/src/define.js';
+
 {
   class CustomGridFlowSelectionColumn extends GridColumn {
     
@@ -35,7 +37,6 @@ import { GridColumn } from '@vaadin/grid/src/vaadin-grid-column.js';
          */
         autoWidth: {
           type: Boolean,
-          value: true
         },
 
         /**
@@ -43,7 +44,6 @@ import { GridColumn } from '@vaadin/grid/src/vaadin-grid-column.js';
          */
         width: {
           type: String,
-          value: '56px'
         },
 
         /**
@@ -51,7 +51,6 @@ import { GridColumn } from '@vaadin/grid/src/vaadin-grid-column.js';
          */
         flexGrow: {
           type: Number,
-          value: 0
         },
 
         /**
@@ -59,24 +58,39 @@ import { GridColumn } from '@vaadin/grid/src/vaadin-grid-column.js';
          */
         selectAll: {
           type: Boolean,
-          value: false,
           notify: true
         },
 
-        selectAllHidden: Boolean
+        selectAllHidden: {
+          type: Boolean,
+        }
       };
     }
 
     constructor() {
       super();
+      this.autoWidth = true;
+      this.width = '56px';
+      this.flexGrow = 0;
+      this.selectAll = false;
+      this.selectAllHidden = false;
+      
       this._boundOnSelectEvent = this._onSelectEvent.bind(this);
       this._boundOnDeselectEvent = this._onDeselectEvent.bind(this);
     }
   
-    static get observers() {
-      return [
-        '_onHeaderRendererOrBindingChanged(_headerRenderer, _headerCell, path, header, selectAll, selectAllHidden)'
-      ];
+    /** @protected */
+    updated(changedProperties) {
+      super.updated(changedProperties);
+      
+      // Handle property changes that affect header rendering
+      if (changedProperties.has('_headerRenderer') || 
+          changedProperties.has('path') || 
+          changedProperties.has('header') || 
+          changedProperties.has('selectAll') || 
+          changedProperties.has('selectAllHidden')) {
+        this._onHeaderRendererOrBindingChanged();
+      }
     }
 
     /** @private */
@@ -162,7 +176,7 @@ import { GridColumn } from '@vaadin/grid/src/vaadin-grid-column.js';
     }
   }
 
-  customElements.define(CustomGridFlowSelectionColumn.is, CustomGridFlowSelectionColumn);
+  defineCustomElement(CustomGridFlowSelectionColumn);
 
   Vaadin.CustomGridFlowSelectionColumn = CustomGridFlowSelectionColumn;
   

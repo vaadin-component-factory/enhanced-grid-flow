@@ -4,7 +4,7 @@ package com.vaadin.flow.component.grid;
  * #%L
  * Enhanced Grid
  * %%
- * Copyright (C) 2020 - 2024 Vaadin Ltd
+ * Copyright (C) 2020 - 2025 Vaadin Ltd
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,6 @@ import com.vaadin.flow.data.selection.SelectionEvent;
 import com.vaadin.flow.data.selection.SelectionListener;
 import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.shared.Registration;
-import elemental.json.JsonObject;
 import com.vaadin.componentfactory.enhancedgrid.EnhancedGrid;
 
 import java.util.Collections;
@@ -49,7 +48,13 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import tools.jackson.databind.node.ObjectNode;
 
+/**
+ * Abstract implementation of a multi selection model for a grid.
+ * 
+ * @param <T> the type of the grid items
+ */
 // todo jcg try to clean up this class
 public abstract class CustomAbstractGridMultiSelectionModel<T>
         extends Grid.AbstractGridExtension<T> implements GridMultiSelectionModel<T> {
@@ -62,8 +67,8 @@ public abstract class CustomAbstractGridMultiSelectionModel<T>
      * Constructor for passing a reference of the grid to this implementation.
      *
      * @param grid
-     *            reference to the grid for which this selection model is
-     *            created
+     *             reference to the grid for which this selection model is
+     *             created
      */
     public CustomAbstractGridMultiSelectionModel(Grid<T> grid) {
         super(grid);
@@ -87,7 +92,7 @@ public abstract class CustomAbstractGridMultiSelectionModel<T>
     }
 
     private void insertSelectionColumn(Grid<T> grid,
-                                       CustomGridSelectionColumn selectionColumn) {
+            CustomGridSelectionColumn selectionColumn) {
         grid.getElement().insertChild(0, selectionColumn.getElement());
     }
 
@@ -205,7 +210,7 @@ public abstract class CustomAbstractGridMultiSelectionModel<T>
     @Override
     public boolean isSelected(T item) {
         return getSelectedItems().stream().anyMatch(selectedItem -> Objects
-            .equals(getItemId(selectedItem), getItemId(item)));
+                .equals(getItemId(selectedItem), getItemId(item)));
     }
 
     @Override
@@ -292,22 +297,22 @@ public abstract class CustomAbstractGridMultiSelectionModel<T>
     @Override
     public boolean isSelectAllCheckboxVisible() {
         switch (selectAllCheckBoxVisibility) {
-        case DEFAULT:
-            return getGrid().getDataCommunicator().getDataProvider()
-                    .isInMemory();
-        case HIDDEN:
-            return false;
-        case VISIBLE:
-            return true;
-        default:
-            throw new IllegalStateException(String.format(
-                    "Select all checkbox visibility is set to an unsupported value: %s",
-                    selectAllCheckBoxVisibility));
+            case DEFAULT:
+                return getGrid().getDataCommunicator().getDataProvider()
+                        .isInMemory();
+            case HIDDEN:
+                return false;
+            case VISIBLE:
+                return true;
+            default:
+                throw new IllegalStateException(String.format(
+                        "Select all checkbox visibility is set to an unsupported value: %s",
+                        selectAllCheckBoxVisibility));
         }
     }
 
     @Override
-    public void generateData(T item, JsonObject jsonObject) {
+    public void generateData(T item, ObjectNode jsonObject) {
         if (isSelected(item)) {
             jsonObject.put("selected", true);
         }
@@ -327,7 +332,7 @@ public abstract class CustomAbstractGridMultiSelectionModel<T>
      * Method for handling the firing of selection events.
      *
      * @param event
-     *            the selection event to fire
+     *              the selection event to fire
      */
     protected abstract void fireSelectionEvent(
             SelectionEvent<Grid<T>, T> event);
@@ -355,7 +360,7 @@ public abstract class CustomAbstractGridMultiSelectionModel<T>
      * Fetch all items from the given hierarchical data provider.
      *
      * @param dataProvider
-     *            the data provider to fetch from
+     *                     the data provider to fetch from
      * @return all items in the data provider
      */
     private Stream<T> fetchAllHierarchical(
@@ -368,9 +373,9 @@ public abstract class CustomAbstractGridMultiSelectionModel<T>
      * provider.
      *
      * @param parent
-     *            the parent item to fetch descendants for
+     *                     the parent item to fetch descendants for
      * @param dataProvider
-     *            the data provider to fetch from
+     *                     the data provider to fetch from
      * @return the stream of all descendant items
      */
     private Stream<T> fetchAllDescendants(T parent,
@@ -400,23 +405,25 @@ public abstract class CustomAbstractGridMultiSelectionModel<T>
 
     private void doUpdateSelection(Set<T> addedItems, Set<T> removedItems,
             boolean userOriginated) {
-        Set<T> filteredAddedItems = addedItems.stream().filter(item -> ((EnhancedGrid) getGrid()).getSelectionPredicate().test(item)).collect(Collectors.toSet());
+        Set<T> filteredAddedItems = addedItems.stream()
+                .filter(item -> ((EnhancedGrid) getGrid()).getSelectionPredicate().test(item))
+                .collect(Collectors.toSet());
         Map<Object, T> addedItemsMap = mapItemsById(filteredAddedItems);
         Map<Object, T> removedItemsMap = mapItemsById(removedItems);
         addedItemsMap.keySet().stream().filter(removedItemsMap::containsKey)
-            .collect(Collectors.toList()).forEach(key -> {
-            addedItemsMap.remove(key);
-            removedItemsMap.remove(key);
-        });
-        doUpdateSelection(addedItemsMap,removedItemsMap,userOriginated);
+                .collect(Collectors.toList()).forEach(key -> {
+                    addedItemsMap.remove(key);
+                    removedItemsMap.remove(key);
+                });
+        doUpdateSelection(addedItemsMap, removedItemsMap, userOriginated);
     }
 
     private void doUpdateSelection(Map<Object, T> addedItems,
-        Map<Object, T> removedItems, boolean userOriginated) {
+            Map<Object, T> removedItems, boolean userOriginated) {
 
         Map<Object, T> selectedMap = mapItemsById(selected);
         if (selectedMap.keySet().containsAll(addedItems.keySet()) && Collections
-            .disjoint(selectedMap.keySet(), removedItems.keySet())) {
+                .disjoint(selectedMap.keySet(), removedItems.keySet())) {
             return;
         }
         Set<T> oldSelection = new LinkedHashSet<>(selected);
@@ -426,13 +433,13 @@ public abstract class CustomAbstractGridMultiSelectionModel<T>
         selected.addAll(selectedMap.values());
 
         sendSelectionUpdate(new LinkedHashSet<>(addedItems.values()),
-            getGrid()::doClientSideSelection);
+                getGrid()::doClientSideSelection);
         sendSelectionUpdate(new LinkedHashSet<>(removedItems.values()),
-            getGrid()::doClientSideDeselection);
+                getGrid()::doClientSideDeselection);
 
         fireSelectionEvent(
-            new MultiSelectionEvent<>(getGrid(), getGrid().asMultiSelect(),
-                oldSelection, userOriginated));
+                new MultiSelectionEvent<>(getGrid(), getGrid().asMultiSelect(),
+                        oldSelection, userOriginated));
         if (!removedItems.isEmpty()) {
             selectionColumn.setSelectAllCheckboxState(false);
         }
@@ -440,7 +447,7 @@ public abstract class CustomAbstractGridMultiSelectionModel<T>
 
     private Map<Object, T> mapItemsById(Set<T> items) {
         return items.stream().collect(LinkedHashMap::new,
-            (map, item) -> map.put(this.getItemId(item), item), Map::putAll);
+                (map, item) -> map.put(this.getItemId(item), item), Map::putAll);
     }
 
     private void sendSelectionUpdate(Set<T> updatedItems,

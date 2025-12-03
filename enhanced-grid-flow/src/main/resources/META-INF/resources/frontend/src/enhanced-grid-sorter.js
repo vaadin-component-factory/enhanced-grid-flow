@@ -2,7 +2,7 @@
  * #%L
  * Enhanced Grid
  * %%
- * Copyright (C) 2020 - 2024 Vaadin Ltd
+ * Copyright (C) 2020 - 2025 Vaadin Ltd
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,17 +18,23 @@
  * #L%
  */
  
- /**
+/**
  * `<enhanced-grid-sorter>` is a helper element for the `<vaadin-grid>` that extends `<vaadin-grid-sorter>`
  * adding support to display a button for filtering
  */
-import { html } from '@polymer/polymer/polymer-element.js';
-import { GridSorter } from '@vaadin/grid/vaadin-grid-sorter.js';
+import { html, css } from 'lit';
+import { defineCustomElement } from '@vaadin/component-base/src/define.js';
+import { GridSorter } from '@vaadin/grid/src/vaadin-grid-sorter.js';
 
 class EnhancedGridSorter extends GridSorter {
-  static get template() {
-    return html`
-      <style>
+  static get is() {
+    return 'enhanced-grid-sorter';
+  }
+
+  static get styles() {
+    return [
+      super.styles,
+      css`
         :host(:not([sortable])) [part='indicators']::before {
           display: none;
         }
@@ -54,96 +60,117 @@ class EnhancedGridSorter extends GridSorter {
           color: var(--lumo-body-text-color);
           opacity: 0.2;
         }
-
-      </style>
-
-      ${super.template}
-
-      <slot name="direction"></slot> 
-      <vaadin-button theme="icon" part="filter-button" role="button" path="[[path]]" on-click="_onFilterClick">
-    	  <vaadin-icon icon="[[filtericon]]" slot="prefix" ></vaadin-icon>
-      </vaadin-button>
-    `;
+      `
+    ];
   }
-  
-   static get properties() {
+
+  static get properties() {
     return {
-       path: {
-        type: Boolean,
-        reflectToAttribute: true,
-        value: null
+      path: {
+        type: String,
+        reflect: true,
       },
-       filtered: {
+      filtered: {
         type: Boolean,
-        reflectToAttribute: true,
-        value: false
+        reflect: true,
       },
       sortable: {
         type: Boolean,
-        reflectToAttribute: true,
-        value: false
+        reflect: true,
       },
       filtericon: {
-        type:String,
-        reflectToAttribute: true,
-        value: "vaadin:filter"
+        type: String,
+        reflect: true,
       }
     };
   }
 
-  static get is() {
-    return 'enhanced-grid-sorter';
+  constructor() {
+    super();
+    this.path = null;
+    this.filtered = false;
+    this.sortable = false;
+    this.filtericon = "vaadin:filter";
   }
 
-    /** @private */
- _onFilterClick(e) {
+  /** @protected */
+  render() {
+    return html`
+      <div part="content">
+        <slot></slot>
+      </div>
+      <div part="indicators">
+        <span part="order">${this._getDisplayOrder(this._order)}</span>
+      </div>
+      <slot name="direction"></slot>
+      <vaadin-button 
+        theme="icon" 
+        part="filter-button" 
+        role="button" 
+        .path="${this.path}"
+        @click="${this._onFilterClick}">
+        <vaadin-icon icon="${this.filtericon}" slot="prefix"></vaadin-icon>
+      </vaadin-button>
+    `;
+  }
+
+  /** @private */
+  _onFilterClick(e) {
     e.stopPropagation();
 
     const theButtonPath = e.target.tagName.toLowerCase() === 'vaadin-icon' ? e.target.parentElement.path : e.target.path;
     this.dispatchEvent(new CustomEvent('filter-clicked', { bubbles: true, composed: true, detail: { id: theButtonPath } }));
- }
+  }
 
- _onClick(e) {
-   if(this.sortable) {
-	   super._onClick(e);
-     this._updateSorterDirection();
-     } 
- }
+  /** @protected */
+  _onClick(e) {
+    if(this.sortable) {
+      super._onClick(e);
+      this._updateSorterDirection();
+    } 
+  }
 
- /** @private */
- _updateSorterDirection() {
-    var sorter = this.querySelector("vaadin-grid-sorter");
+  /** @private */
+  _updateSorterDirection() {
+    const sorter = this.querySelector("vaadin-grid-sorter");
     if(sorter){
       sorter.direction = this.direction;
     }
- }
+  }
     
- connectedCallback () {
-	super.connectedCallback ();
-	
-	var slot = this.shadowRoot.querySelector("slot[name='direction']");
-	var handler = this.__copyDirection.bind(this);
-	slot.addEventListener('slotchange', handler);
-	handler();
- }
+  /** @protected */
+  connectedCallback() {
+    super.connectedCallback();
+    
+    // Wait for the next frame to ensure shadow DOM is ready
+    requestAnimationFrame(() => {
+      const slot = this.shadowRoot.querySelector("slot[name='direction']");
+      if (slot) {
+        const handler = this.__copyDirection.bind(this);
+        slot.addEventListener('slotchange', handler);
+        handler();
+      }
+    });
+  }
 
- __copyDirection() {
-	var sorter = this.querySelector("vaadin-grid-sorter");
-	if(sorter){
-		this.direction = sorter.direction;
-		sorter.addEventListener('direction-changed', function(e) {
-			this.direction = sorter.direction;	
-			e.stopPropagation();	
-		}.bind(this));
-		sorter.addEventListener('sorter-changed', function(e) {
-			e.stopPropagation();	
-		});
-	}
- }  
+  /** @private */
+  __copyDirection() {
+    const sorter = this.querySelector("vaadin-grid-sorter");
+    if(sorter){
+      this.direction = sorter.direction;
+      sorter.addEventListener('direction-changed', (e) => {
+        this.direction = sorter.direction;	
+        e.stopPropagation();	
+      });
+      sorter.addEventListener('sorter-changed', (e) => {
+        e.stopPropagation();	
+      });
+    }
+  }  
 
 }
 
-customElements.define(EnhancedGridSorter.is, EnhancedGridSorter);
+defineCustomElement(EnhancedGridSorter);
 
 function _patch($connector) {
   const tryCatchWrapper = function (callback) {

@@ -4,7 +4,7 @@ package com.vaadin.flow.component.grid;
  * #%L
  * Enhanced Grid
  * %%
- * Copyright (C) 2020 - 2024 Vaadin Ltd
+ * Copyright (C) 2020 - 2025 Vaadin Ltd
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,25 +24,47 @@ import com.vaadin.componentfactory.enhancedgrid.EnhancedGrid;
 import com.vaadin.flow.function.SerializablePredicate;
 
 /**
- * Filter class to set a filter predicate to a {@link EnhancedGrid grid} in lazy loading mode.
+ * Filter class to set a filter predicate to a {@link EnhancedGrid grid} in lazy
+ * loading mode.
  * 
+ * @param <T>
+ *            type of the underlying grid this filter is compatible with
  */
 public class Filter<T> {
-	
+
 	private SerializablePredicate<T> filterPredicate;
-	
-	public Filter() {}
-	
+
+	/**
+	 * Default constructor.
+	 */
+	public Filter() {
+	}
+
+	/**
+	 * Constructor with filter predicate.
+	 * 
+	 * @param filterPredicate the filter predicate to set
+	 */
 	public Filter(SerializablePredicate<T> filterPredicate) {
 		this.filterPredicate = filterPredicate;
 	}
 
+	/**
+	 * Get the filter predicate.
+	 * 
+	 * @return the filter predicate
+	 */
 	public SerializablePredicate<T> getFilterPredicate() {
 		return filterPredicate;
 	}
 
+	/**
+	 * Set the filter predicate.
+	 * 
+	 * @param filterPredicate the filter predicate to set
+	 */
 	public void setFilterPredicate(SerializablePredicate<T> filterPredicate) {
 		this.filterPredicate = filterPredicate;
 	}
-	
+
 }
