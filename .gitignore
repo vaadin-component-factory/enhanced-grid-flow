@@ -41,7 +41,7 @@ enhanced-grid-flow/src/main/resources/rebel.xml
 .classpath
 .project
 .settings
-.vscode/settings.json
+enhanced-grid-flow/.vscode/settings.json
 
 enhanced-grid-flow-demo/frontend/generated
 enhanced-grid-flow-demo/src/main/dev-bundle
