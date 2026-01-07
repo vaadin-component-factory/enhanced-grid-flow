@@ -34,11 +34,6 @@
  */
 package com.vaadin.componentfactory.enhancedtreegrid;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.NoSuchElementException;
-
 import com.vaadin.flow.data.provider.ArrayUpdater;
 import com.vaadin.flow.data.provider.CompositeDataGenerator;
 import com.vaadin.flow.data.provider.hierarchy.HierarchicalDataCommunicator;
@@ -48,9 +43,13 @@ import com.vaadin.flow.data.provider.hierarchy.TreeDataProvider;
 import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.function.SerializableSupplier;
 import com.vaadin.flow.function.ValueProvider;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.NoSuchElementException;
 
 /**
- * This class is for internal use only.
+ * WARNING: This class is for internal use only.
  */
 class TreeGridDataCommunicator<T> extends HierarchicalDataCommunicator<T> {
     private final Element element;
@@ -69,6 +68,11 @@ class TreeGridDataCommunicator<T> extends HierarchicalDataCommunicator<T> {
         if (element != null) {
             element.callJsFunction("$connector.reset");
         }
+    }
+
+    @Override
+    public void refreshViewport() {
+        super.refreshViewport();
     }
 
     @Override
