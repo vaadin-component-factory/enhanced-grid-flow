@@ -1047,6 +1047,11 @@ public class EnhancedTreeGrid<T> extends EnhancedGrid<T> implements HasHierarchi
 			scrollToIndex(indexPath);
 		}
 	}
+	
+	@Override
+    protected void refreshViewport() {
+        ((TreeGridDataCommunicator<T>) getDataCommunicator()).refreshViewport();
+    }
 
 	@Override
 	protected void applyFilterPredicate(SerializablePredicate<T> finalPredicate) {
