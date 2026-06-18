@@ -35,6 +35,7 @@ import com.vaadin.flow.component.ClientCallable;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.ComponentUtil;
+import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.grid.Filter;
 import com.vaadin.flow.component.grid.Grid;
@@ -74,6 +75,8 @@ import com.vaadin.flow.shared.Registration;
 
 @SuppressWarnings("serial")
 @Uses(TreeGrid.class)
+@JsModule("@vaadin/grid/src/vaadin-grid-tree-toggle.js")
+@JsModule("./treeGridConnector.ts")
 public class EnhancedTreeGrid<T> extends EnhancedGrid<T> implements HasHierarchicalDataProvider<T> {
 
 	/**
@@ -100,6 +103,20 @@ public class EnhancedTreeGrid<T> extends EnhancedGrid<T> implements HasHierarchi
 
 		setUniqueKeyProperty("key");
 		addTreeDataGenerator();
+	}
+
+	@Override
+	protected void initConnector() {
+		// Using Page.executeJs to ensure this runs before any other
+		// executeJs calls scheduled on the component that require the
+		// connector. The tree grid relies on treeGridConnector (not the base
+		// gridConnector) to translate the server-provided flat data with
+		// per-item level information into the hierarchical, indented display.
+		getUI().orElseThrow(() -> new IllegalStateException(
+				"Connector can only be initialized for an attached Grid"))
+				.getPage().executeJs(
+						"if ($0) window.Vaadin.Flow.treeGridConnector.initLazy($0)",
+						getElement());
 	}
 
 	/**
