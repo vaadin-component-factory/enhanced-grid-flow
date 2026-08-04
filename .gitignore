@@ -44,9 +44,9 @@ enhanced-grid-flow/src/main/resources/rebel.xml
 .vscode
 enhanced-grid-flow/.vscode/settings.json
 
-enhanced-grid-flow-demo/frontend/generated
+enhanced-grid-flow-demo/src/main/frontend/generated
 enhanced-grid-flow-demo/src/main/dev-bundle
-enhanced-grid-flow-demo/frontend/index.html
+enhanced-grid-flow-demo/src/main/frontend/index.html
 enhanced-grid-flow-demo/tsconfig.json
 enhanced-grid-flow-demo/types.d.ts
 enhanced-grid-flow-demo/vite.config.ts
