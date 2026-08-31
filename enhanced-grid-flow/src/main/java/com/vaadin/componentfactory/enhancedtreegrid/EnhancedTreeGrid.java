@@ -35,7 +35,6 @@ import com.vaadin.flow.component.ClientCallable;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.ComponentUtil;
-import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.dependency.Uses;
 import com.vaadin.flow.component.grid.Filter;
 import com.vaadin.flow.component.grid.Grid;
@@ -75,8 +74,6 @@ import com.vaadin.flow.shared.Registration;
 
 @SuppressWarnings("serial")
 @Uses(TreeGrid.class)
-@JsModule("@vaadin/grid/src/vaadin-grid-tree-toggle.js")
-@JsModule("./treeGridConnector.ts")
 public class EnhancedTreeGrid<T> extends EnhancedGrid<T> implements HasHierarchicalDataProvider<T> {
 
 	/**
