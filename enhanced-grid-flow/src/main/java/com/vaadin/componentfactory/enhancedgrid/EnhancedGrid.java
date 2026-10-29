@@ -212,7 +212,12 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver, App
      *                                the data communicator builder type
      * @param <U>
      *                                the GridArrayUpdater type
+     * @deprecated Override {@link #createDataCommunicator()} instead. This
+     *             constructor will be removed together with
+     *             {@link Grid.DataCommunicatorBuilder} in Vaadin 26.
      */
+    @Deprecated(since = "6.1.0", forRemoval = true)
+    @SuppressWarnings("removal")
     protected <U extends GridArrayUpdater, B extends DataCommunicatorBuilder<T, U>> EnhancedGrid(
             Class<T> beanType, B dataCommunicatorBuilder) {
         super(beanType, dataCommunicatorBuilder);
@@ -235,7 +240,12 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver, App
      *                                when <code>true</code>, columns are created
      *                                automatically for
      *                                the properties of the beanType
+     * @deprecated Override {@link #createDataCommunicator()} instead. This
+     *             constructor will be removed together with
+     *             {@link Grid.DataCommunicatorBuilder} in Vaadin 26.
      */
+    @Deprecated(since = "6.1.0", forRemoval = true)
+    @SuppressWarnings("removal")
     protected <U extends GridArrayUpdater, B extends DataCommunicatorBuilder<T, U>> EnhancedGrid(
             Class<T> beanType, B dataCommunicatorBuilder,
             boolean autoCreateColumns) {
@@ -256,7 +266,12 @@ public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver, App
      *                                the data communicator builder type
      * @param <U>
      *                                the GridArrayUpdater type
+     * @deprecated Override {@link #createDataCommunicator()} instead. This
+     *             constructor will be removed together with
+     *             {@link Grid.DataCommunicatorBuilder} in Vaadin 26.
      */
+    @Deprecated(since = "6.1.0", forRemoval = true)
+    @SuppressWarnings("removal")
     protected <U extends GridArrayUpdater, B extends DataCommunicatorBuilder<T, U>> EnhancedGrid(
             int pageSize, B dataCommunicatorBuilder) {
         super(pageSize, dataCommunicatorBuilder);
