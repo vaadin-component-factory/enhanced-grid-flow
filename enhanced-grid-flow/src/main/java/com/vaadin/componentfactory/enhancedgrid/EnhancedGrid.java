@@ -73,7 +73,7 @@ import tools.jackson.databind.node.ObjectNode;
  *
  * @param <T> the grid bean type
  */
-@CssImport(value = "./styles/enhanced-grid-selection-disabled.css", themeFor = "vaadin-grid")
+@CssImport("./styles/enhanced-grid-selection-disabled.css")
 public class EnhancedGrid<T> extends Grid<T> implements BeforeLeaveObserver, ApplyFilterListener {
 
 	private static final String CANCEL_EDIT_MSG_KEY = "cancel-edit-dialog.text";
