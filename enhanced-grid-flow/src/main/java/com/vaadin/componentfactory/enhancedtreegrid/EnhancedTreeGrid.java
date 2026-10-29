@@ -49,7 +49,6 @@ import com.vaadin.flow.component.treegrid.TreeGrid;
 import com.vaadin.flow.data.binder.PropertyDefinition;
 import com.vaadin.flow.data.provider.BackEndDataProvider;
 import com.vaadin.flow.data.provider.CallbackDataProvider;
-import com.vaadin.flow.data.provider.CompositeDataGenerator;
 import com.vaadin.flow.data.provider.DataCommunicator;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.provider.ListDataProvider;
@@ -65,10 +64,8 @@ import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.LitRenderer;
 import com.vaadin.flow.data.renderer.Renderer;
 import com.vaadin.flow.dom.DisabledUpdateMode;
-import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.function.SerializableComparator;
 import com.vaadin.flow.function.SerializablePredicate;
-import com.vaadin.flow.function.SerializableSupplier;
 import com.vaadin.flow.function.ValueProvider;
 import com.vaadin.flow.shared.Registration;
 
@@ -81,25 +78,48 @@ public class EnhancedTreeGrid<T> extends EnhancedGrid<T> implements HasHierarchi
 	 * 
 	 */
 	public EnhancedTreeGrid() {
-		this(50, new TreeDataCommunicatorBuilder<T>());
+		this(50);
+	}
+
+	/**
+	 * Creates a new {@code EnhancedTreeGrid} with the given page size.
+	 *
+	 * @param pageSize
+	 *                 the page size. Must be greater than zero.
+	 */
+	protected EnhancedTreeGrid(int pageSize) {
+		super(pageSize);
+
+		setUniqueKeyProperty("key");
+		addTreeDataGenerator();
 	}
 
 	/**
 	 * @see TreeGrid#TreeGrid(int, DataCommunicatorBuilder)
-	 * 
+	 *
 	 * @param pageSize
 	 *                                the page size. Must be greater than zero.
 	 * @param dataCommunicatorBuilder
-	 *                                Builder for {@link DataCommunicator}
-	 *                                implementation this Grid
-	 *                                uses to handle all data communication.
+	 *                                ignored, the tree grid always uses its own
+	 *                                data communicator
+	 * @deprecated Use {@link #EnhancedTreeGrid(int)} and override
+	 *             {@link #createDataCommunicator()} to customize the data
+	 *             communicator. The given builder is ignored. This constructor
+	 *             will be removed together with
+	 *             {@link Grid.DataCommunicatorBuilder} in Vaadin 26.
 	 */
+	@Deprecated(since = "6.1.0", forRemoval = true)
+	@SuppressWarnings("removal")
 	protected EnhancedTreeGrid(int pageSize,
 			DataCommunicatorBuilder<T, GridArrayUpdater> dataCommunicatorBuilder) {
-		super(pageSize, dataCommunicatorBuilder);
+		this(pageSize);
+	}
 
-		setUniqueKeyProperty("key");
-		addTreeDataGenerator();
+	@Override
+	protected DataCommunicator<T> createDataCommunicator() {
+		return new TreeGridDataCommunicator<>(getElement(),
+				getCompositeDataGenerator(), getArrayUpdater(),
+				this::getUniqueKeyProvider);
 	}
 
 	@Override
@@ -154,13 +174,7 @@ public class EnhancedTreeGrid<T> extends EnhancedGrid<T> implements HasHierarchi
 	 *                          automatically, {@code false} otherwise
 	 */
 	public EnhancedTreeGrid(Class<T> beanType, boolean autoCreateColumns) {
-		this(beanType, new TreeDataCommunicatorBuilder<>(), autoCreateColumns);
-	}
-
-	private EnhancedTreeGrid(Class<T> beanType,
-			DataCommunicatorBuilder<T, GridArrayUpdater> dataCommunicatorBuilder,
-			boolean autoCreateColumns) {
-		super(beanType, dataCommunicatorBuilder, autoCreateColumns);
+		super(beanType, autoCreateColumns);
 
 		setUniqueKeyProperty("key");
 		addTreeDataGenerator();
@@ -175,19 +189,6 @@ public class EnhancedTreeGrid<T> extends EnhancedGrid<T> implements HasHierarchi
 	public EnhancedTreeGrid(HierarchicalDataProvider<T, ?> dataProvider) {
 		this();
 		setDataProvider(dataProvider);
-	}
-
-	private static class TreeDataCommunicatorBuilder<T>
-			extends DataCommunicatorBuilder<T, GridArrayUpdater> {
-
-		@Override
-		protected DataCommunicator<T> build(Element element,
-				CompositeDataGenerator<T> dataGenerator,
-				GridArrayUpdater arrayUpdater,
-				SerializableSupplier<ValueProvider<T, String>> uniqueKeyProviderSupplier) {
-			return new TreeGridDataCommunicator<>(element, dataGenerator,
-					arrayUpdater, uniqueKeyProviderSupplier);
-		}
 	}
 
 	/**
