@@ -17,6 +17,9 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent.JustifyContentMode;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.data.provider.hierarchy.HierarchicalDataProvider.HierarchyFormat;
+import com.vaadin.flow.data.provider.hierarchy.TreeData;
+import com.vaadin.flow.data.provider.hierarchy.TreeDataProvider;
 import com.vaadin.flow.router.Route;
 
 /**
@@ -47,8 +50,10 @@ public class SingleTreeGridView extends Div {
         });
     	
     	// set items
-		grid.setItems(departmentData.getRootDepartments(),
-		        departmentData::getChildDepartments);
+		grid.setDataProvider(new TreeDataProvider<>(
+		        new TreeData<Department>().addItems(departmentData.getRootDepartments(),
+		                departmentData::getChildDepartments),
+		        HierarchyFormat.NESTED));
 		
 		// add columns
 		EnhancedColumn<Department> nameColumn = grid.addHierarchyColumn(Department::getName)

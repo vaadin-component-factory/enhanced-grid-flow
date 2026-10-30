@@ -12,7 +12,7 @@ public class TranslationProvider implements I18NProvider {
     @Override
     public List<Locale> getProvidedLocales() {
         return Collections
-                .unmodifiableList(Arrays.asList(new Locale("en"), new Locale("es")));
+                .unmodifiableList(Arrays.asList(Locale.of("en"), Locale.of("es")));
     }
 
     @Override
