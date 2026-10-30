@@ -15,6 +15,11 @@ This component is an extended version of Grid that provides support to the follo
 - pre-selection of filters to apply for each column
 - pre-selection of sorting direction for each column
 
+## Compatibility
+
+- Version 6.1.0 and later requires Vaadin 25.3 or later
+- Version 6.0.x requires Vaadin 25.0 or later
+
 ## Development instructions
 
 Build the project and install the add-on locally:
