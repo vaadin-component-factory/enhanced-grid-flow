@@ -162,8 +162,8 @@ public class EnhancedColumn<T> extends Grid.Column<T> implements BeforeEnterObse
 			}
 		});
 
-		// add filter field to header
-		headerComponent.getElement().appendChild(filterField.getElement());
+		// the popover attaches itself to the UI (or closest modal) when the target
+		// is attached, so clicks on it don't reach the header sorter
 		filterField.setTarget(headerComponent);
 
 		grid.addFilterClickedEventListener(e -> {
