@@ -138,9 +138,6 @@
                         <goals>
                             <goal>prepare-frontend</goal>
                         </goals>
-                        <configuration>
-                            <convertHtml>false</convertHtml>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
